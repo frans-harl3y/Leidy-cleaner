@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { themeManager } from '../../utils/themeManager';
+import { getThemeManager } from '../../utils/themeManager';
 
 /**
- * 🎨 Theme Selector Component
+ * Theme Selector Component
  * Permite ao usuário alternar entre temas
  */
 export default function ThemeSelector() {
@@ -10,6 +10,10 @@ export default function ThemeSelector() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    // Obter tema manager (apenas no cliente)
+    const themeManager = getThemeManager();
+    if (!themeManager) return;
+
     // Obter tema atual
     setCurrentTheme(themeManager.getCurrentTheme());
 
@@ -25,29 +29,32 @@ export default function ThemeSelector() {
   const themes = [
     {
       id: 'light',
-      name: '☀️ Claro',
+      name: 'Claro',
       description: 'Tema claro com verde vibrante'
     },
     {
       id: 'dark',
-      name: '🌙 Escuro',
+      name: 'Escuro',
       description: 'Tema escuro para economia de bateria'
     },
     {
       id: 'high-contrast',
-      name: '♿ Alto Contraste',
+      name: 'Alto Contraste',
       description: 'Acessibilidade aumentada'
     },
     {
       id: 'auto',
-      name: '🔄 Automático',
+      name: 'Automatico',
       description: 'Segue preferência do sistema'
     }
   ];
 
   const handleThemeChange = (themeId) => {
-    themeManager.setTheme(themeId);
-    setCurrentTheme(themeId);
+    const themeManager = getThemeManager();
+    if (themeManager) {
+      themeManager.setTheme(themeId);
+      setCurrentTheme(themeId);
+    }
     setIsOpen(false);
   };
 

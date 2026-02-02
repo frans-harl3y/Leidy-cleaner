@@ -1,7 +1,5 @@
 /**
- * 🎨 Theme Manager
- * Gerencia temas da aplicação (light, dark, high-contrast)
- * Suporta preferências do sistema operacional
+ * Theme Manager - Gerencia temas da aplicação
  */
 
 const THEME_KEY = 'vamos_theme';
@@ -9,11 +7,17 @@ const THEMES = {
   LIGHT: 'light',
   DARK: 'dark',
   HIGH_CONTRAST: 'high-contrast',
-  AUTO: 'auto' // Segue preferência do sistema
+  AUTO: 'auto'
 };
 
 class ThemeManager {
   constructor() {
+    // Apenas executar no browser
+    if (typeof window === 'undefined') {
+      this.currentTheme = THEMES.AUTO;
+      return;
+    }
+    
     this.currentTheme = this.getStoredTheme();
     this.element = document.documentElement;
     this.applyTheme(this.currentTheme);
@@ -21,12 +25,21 @@ class ThemeManager {
   }
 
   /**
-   * Obter tema armazenado no localStorage
+   * Obter tema armazenado no localStorage (com check de disponibilidade)
    */
   getStoredTheme() {
-    const stored = localStorage.getItem(THEME_KEY);
-    if (stored && Object.values(THEMES).includes(stored)) {
-      return stored;
+    // Verificar se localStorage está disponível
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return THEMES.AUTO;
+    }
+    
+    try {
+      const stored = localStorage.getItem(THEME_KEY);
+      if (stored && Object.values(THEMES).includes(stored)) {
+        return stored;
+      }
+    } catch (e) {
+      console.warn('localStorage not available:', e);
     }
     return THEMES.AUTO;
   }
@@ -35,6 +48,7 @@ class ThemeManager {
    * Obter tema do sistema (light ou dark)
    */
   getSystemTheme() {
+    if (typeof window === 'undefined') return THEMES.LIGHT;
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return THEMES.DARK;
     }
@@ -55,6 +69,8 @@ class ThemeManager {
    * Aplicar tema ao HTML
    */
   applyTheme(theme) {
+    if (typeof window === 'undefined') return;
+    
     const effectiveTheme = theme === THEMES.AUTO ? this.getSystemTheme() : theme;
     
     // Remover todas as classes de tema
@@ -74,12 +90,22 @@ class ThemeManager {
     this.updateMetaThemeColor(effectiveTheme);
     
     this.currentTheme = theme;
-    localStorage.setItem(THEME_KEY, theme);
+    
+    // Salvar no localStorage com proteção
+    if (window.localStorage) {
+      try {
+        localStorage.setItem(THEME_KEY, theme);
+      } catch (e) {
+        console.warn('Cannot save theme to localStorage:', e);
+      }
+    }
     
     // Disparar evento customizado
-    window.dispatchEvent(new CustomEvent('themechange', {
-      detail: { theme, effectiveTheme }
-    }));
+    if (window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('themechange', {
+        detail: { theme, effectiveTheme }
+      }));
+    }
   }
 
   /**
@@ -107,7 +133,7 @@ class ThemeManager {
    * Observar mudanças de preferência do sistema
    */
   observeSystemPreference() {
-    if (!window.matchMedia) return;
+    if (typeof window === 'undefined' || !window.matchMedia) return;
     
     const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
@@ -131,6 +157,8 @@ class ThemeManager {
    * Atualizar cor do tema nas meta tags
    */
   updateMetaThemeColor(theme) {
+    if (typeof window === 'undefined' || !document) return;
+    
     let color = '#22c55e'; // Verde padrão (light)
     
     if (theme === THEMES.DARK) {
@@ -170,10 +198,18 @@ class ThemeManager {
   }
 }
 
-// Exportar singleton
-export const themeManager = new ThemeManager();
+// Criar instância apenas no cliente
+let themeManagerInstance = null;
 
-// Também exportar para uso global
-window.themeManager = themeManager;
+export const getThemeManager = () => {
+  if (typeof window === 'undefined') return null;
+  if (!themeManagerInstance) {
+    themeManagerInstance = new ThemeManager();
+  }
+  return themeManagerInstance;
+};
 
-export default themeManager;
+// Alias para compatibilidade
+export const themeManager = typeof window !== 'undefined' ? getThemeManager() : null;
+
+export default ThemeManager;
