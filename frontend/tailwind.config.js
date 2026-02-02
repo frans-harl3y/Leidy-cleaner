@@ -8,37 +8,82 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // 🟢 Verde principal (todos os modos)
+        // � Azul principal (redesign)
         primary: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c3d66',
+        },
+        // 🔷 Cyan/Teal (complementar)
+        accent: {
+          50: '#ecf8ff',
+          100: '#cff0ff',
+          200: '#a5e7ff',
+          300: '#75d5ff',
+          400: '#4eb3ff',
+          500: '#06b6d4',
+          600: '#0891b2',
+          700: '#0e7490',
+          800: '#155e75',
+          900: '#164e63',
+        },
+        // 🟢 Verde (sucesso/destaque)
+        success: {
           50: '#f0fdf4',
           100: '#dcfce7',
           200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
           500: '#22c55e',
           600: '#16a34a',
           700: '#15803d',
           800: '#166534',
           900: '#145231',
         },
-        // Tons secundários
-        secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+        // 🟠 Laranja (atenção)
+        warning: {
+          50: '#fff7ed',
+          100: '#fee2d5',
+          200: '#fecaca',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
         },
-        // Status colors
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444',
-        info: '#3b82f6',
+        // 🔴 Vermelho (erro)
+        error: {
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#b91c1c',
+        },
+        // 🟣 Roxo (premium/exclusivo)
+        premium: {
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          500: '#a855f7',
+          600: '#9333ea',
+          700: '#7e22ce',
+        },
+        // 🟤 Cinza neutro
+        neutral: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+        },
       },
       spacing: {
         'safe-bottom': 'max(1rem, env(safe-area-inset-bottom))',
@@ -75,6 +120,9 @@ module.exports = {
         'bounce': 'bounce 1s infinite',
         'fade-in': 'fadeIn 0.3s ease-in',
         'slide-up': 'slideUp 0.3s ease-out',
+        'float': 'float 3s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite',
+        'shimmer': 'shimmer 2s infinite',
       },
       keyframes: {
         fadeIn: {
@@ -85,6 +133,23 @@ module.exports = {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        glow: {
+          '0%, 100%': { 'box-shadow': '0 0 5px rgba(6, 182, 212, 0.5)' },
+          '50%': { 'box-shadow': '0 0 20px rgba(6, 182, 212, 0.8)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-1000px 0' },
+          '100%': { backgroundPosition: '1000px 0' },
+        },
+      },
+      backgroundImage: {
+        'gradient-to-r': 'linear-gradient(to right, var(--tw-gradient-stops))',
+        'gradient-to-b': 'linear-gradient(to bottom, var(--tw-gradient-stops))',
+        'shimmer': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
       },
       screens: {
         'xs': '320px',
