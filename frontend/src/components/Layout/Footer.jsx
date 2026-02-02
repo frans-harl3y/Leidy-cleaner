@@ -207,7 +207,9 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-300">
-          <p>&copy; {new Date().getFullYear()} Leidy Cleaner. Todos os direitos reservados.</p>
+          <p>
+            Copyright {new Date().getFullYear()} Leidy Cleaner. Todos os direitos reservados.
+          </p>
         </div>
       </div>
     </footer>

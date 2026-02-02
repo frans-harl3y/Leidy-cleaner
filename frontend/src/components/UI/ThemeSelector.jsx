@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { themeManager } from '../utils/themeManager';
+import { themeManager } from '../../utils/themeManager';
 
 /**
  * 🎨 Theme Selector Component
