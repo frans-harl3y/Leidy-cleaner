@@ -77,12 +77,14 @@ export default function Home() {
 
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <Link href="/agendar">
-                      <a className="bg-white text-blue-600 font-bold py-4 px-8 rounded-lg hover:bg-gray-100 transition-all text-center text-lg shadow-xl hover:shadow-2xl">
+                      <a className="bg-white text-blue-600 font-bold py-4 px-8 rounded-lg hover:bg-gray-100 transition-all text-center text-lg shadow-xl hover:shadow-2xl inline-flex items-center justify-center gap-2">
+                        <span>📅</span>
                         Agendar Limpeza
                       </a>
                     </Link>
                     <Link href="/servicos">
-                      <a className="border-2 border-white text-white font-bold py-4 px-8 rounded-lg hover:bg-white/10 transition-all text-center text-lg">
+                      <a className="border-2 border-white text-white font-bold py-4 px-8 rounded-lg hover:bg-white/10 transition-all text-center text-lg inline-flex items-center justify-center gap-2">
+                        <span>✨</span>
                         Ver Servicos
                       </a>
                     </Link>
@@ -317,11 +319,12 @@ export default function Home() {
                       ))}
                     </ul>
                     <Link href="/agendar">
-                      <a className={`w-full py-3 rounded-lg font-bold transition-colors text-center block ${
+                      <a className={`w-full py-3 rounded-lg font-bold transition-colors text-center inline-flex items-center justify-center gap-2 ${
                         plan.featured
                           ? 'bg-white text-blue-600 hover:bg-gray-100'
                           : 'bg-blue-600 text-white hover:bg-blue-700'
                       }`}>
+                        <span>📅</span>
                         Agendar Agora
                       </a>
                     </Link>
@@ -341,8 +344,10 @@ export default function Home() {
                 Agora e a hora. Agende sua primeira limpeza e receba 10% de desconto.
               </p>
               <Link href="/agendar">
-                <a className="inline-block bg-white text-blue-600 font-bold py-4 px-12 rounded-lg hover:bg-gray-100 transition-colors text-lg shadow-xl">
+                <a className="inline-flex items-center gap-3 bg-white text-blue-600 font-bold py-4 px-12 rounded-lg hover:bg-gray-100 transition-colors text-lg shadow-xl hover:shadow-2xl hover:scale-105">
+                  <span className="text-2xl">✨</span>
                   Agendar Primeira Limpeza
+                  <span className="text-2xl">→</span>
                 </a>
               </Link>
             </div>
