@@ -14,13 +14,18 @@ let mode = 'sqlite';
 let pgPool = null;
 
 if (process.env.DATABASE_URL) {
-  try {
-    pgPool = new Pool({ connectionString: process.env.DATABASE_URL });
-    mode = 'pg';
-  } catch (err) {
-    console.warn('DB: Could not initialize Postgres pool, falling back to SQLite', err.message);
+  // If the DATABASE_URL explicitly points to SQLite, keep sqlite mode.
+  if (process.env.DATABASE_URL.startsWith('sqlite:')) {
+    mode = 'sqlite';
+  } else {
+    try {
+      pgPool = new Pool({ connectionString: process.env.DATABASE_URL });
+      mode = 'pg';
+    } catch (err) {
+      console.warn('DB: Could not initialize Postgres pool, falling back to SQLite', err.message);
+      mode = 'sqlite';
+    }
   }
-} else {
 }
 
 const sqliteDbPromise = sqlite.getDb;
