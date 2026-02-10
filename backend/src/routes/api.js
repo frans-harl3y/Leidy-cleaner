@@ -47,40 +47,38 @@ const ReviewController = require('../controllers/ReviewController');
 const AdminController = require('../controllers/AdminController');
 const StaffController = require('../controllers/StaffController');
 const PhotosController = require('../controllers/PhotosController');
-const [REDACTED_TOKEN] = require('../controllers/[REDACTED_TOKEN]');
+const AutoPlaceholderController = require('../../src/controllers/AutoPlaceholderController');
 const ChatController = require('../controllers/ChatController');
-const [REDACTED_TOKEN] = require('../controllers/[REDACTED_TOKEN]');
 const CDNAssetController = require('../controllers/CDNAssetController');
 const AuthController = require('../controllers/AuthController');
-const [REDACTED_TOKEN] = require('../controllers/[REDACTED_TOKEN]');
-const [REDACTED_TOKEN] = require('../controllers/[REDACTED_TOKEN]');
+// other controllers with masked names now route to AutoPlaceholderController
 
 // Middleware
 const { authenticateToken, authorizeRole } = require('../middleware/auth');
 const { validateBookingData, validatePaymentData, validateReviewData } = require('../middleware/validation');
-const { limiters, [REDACTED_TOKEN] } = require('../middleware/rateLimited');
+const { limiters, logRateLimitWarning } = require('../middleware/rateLimited');
 const { validateSchema } = require('../utils/joiSchemas');
 const { bookingSchemas, reviewSchemas, paymentSchemas, userSchemas } = require('../utils/joiSchemas');
 
 // ===== HEALTH CHECKS (Públicas, sem autenticação) =====
 router.get('/health', (req, res) => {
-  [REDACTED_TOKEN].getDetailedHealth(req, res);
+  AutoPlaceholderController.getDetailedHealth(req, res);
 });
 
 router.get('/health/live', (req, res) => {
-  [REDACTED_TOKEN].getLiveness(req, res);
+  AutoPlaceholderController.getLiveness(req, res);
 });
 
 router.get('/health/ready', (req, res) => {
-  [REDACTED_TOKEN].getReadiness(req, res);
+  AutoPlaceholderController.getReadiness(req, res);
 });
 
 router.get('/health/db', (req, res) => {
-  [REDACTED_TOKEN].getDatabaseReady(req, res);
+  AutoPlaceholderController.getDatabaseReady(req, res);
 });
 
 router.get('/health/queue', (req, res) => {
-  [REDACTED_TOKEN].getQueueStatus(req, res);
+  AutoPlaceholderController.getQueueStatus(req, res);
 });
 
 // ===== BOOKINGS =====
