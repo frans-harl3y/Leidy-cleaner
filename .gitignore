@@ -76,3 +76,7 @@ docker-compose.override.yml
 # Backups
 backups/
 *.bak
+
+# Docker secrets: ignore real secret files, keep examples
+/docker/secrets/*
+!docker/secrets/*.example

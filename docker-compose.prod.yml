@@ -8,6 +8,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-leidy}
+    # Use Docker secrets in production (create secrets before deploy)
+    secrets:
+      - postgres_password
+    entrypoint: sh -c 'if [ -f /run/secrets/postgres_password ]; then export POSTGRES_PASSWORD=$(cat /run/secrets/postgres_password); fi; docker-entrypoint.sh postgres'
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/setup-db.sql:/[REDACTED_TOKEN].d/setup-db.sql:ro
@@ -23,7 +27,10 @@ services:
       - NODE_ENV=production
       - PORT=${PORT:-3001}
       - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
+    secrets:
+      - jwt_secret
+      - stripe_secret
+      - mercadopago_token
     depends_on:
       - postgres
     ports:
@@ -55,3 +62,13 @@ services:
 
 volumes:
   pgdata:
+
+secrets:
+  postgres_password:
+    external: true
+  jwt_secret:
+    external: true
+  stripe_secret:
+    external: true
+  mercadopago_token:
+    external: true
