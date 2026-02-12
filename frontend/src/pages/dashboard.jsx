@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import { useAuth } from '../context/AuthContext';
 import { LoyaltyCard } from '../components/UI/LoyaltySystem';
 import ReferralSystem from '../components/UI/ReferralSystem';
@@ -133,7 +134,7 @@ export default function Dashboard() {
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700">
               <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">📅 Total de Agendamentos</p>
               <p className="text-4xl font-black text-blue-600 dark:text-blue-400 mb-2">
-                {userProfile.totalBookings}
+                {userProfile?.totalBookings ?? profile.totalBookings}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Dos quais 1 está pendente
@@ -143,7 +144,7 @@ export default function Dashboard() {
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700">
               <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">💰 Total Gasto</p>
               <p className="text-4xl font-black text-green-600 dark:text-green-400 mb-2">
-                {userProfile.totalSpent}
+                {userProfile?.totalSpent ?? profile.totalSpent}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Em todos os serviços
@@ -153,7 +154,7 @@ export default function Dashboard() {
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700">
               <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">⭐ Avaliação</p>
               <p className="text-4xl font-black text-yellow-600 dark:text-yellow-400 mb-2">
-                {userProfile.rating}
+                {userProfile?.rating ?? profile.rating}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 De satisfação com serviços
@@ -317,7 +318,7 @@ export default function Dashboard() {
                     </label>
                     <input
                       type="text"
-                      value={userProfile.name}
+                      value={userProfile?.name ?? profile.name}
                       readOnly
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white bg-gray-50"
                     />
@@ -328,7 +329,7 @@ export default function Dashboard() {
                     </label>
                     <input
                       type="email"
-                      value={userProfile.email}
+                      value={userProfile?.email ?? profile.email}
                       readOnly
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white bg-gray-50"
                     />
@@ -339,7 +340,7 @@ export default function Dashboard() {
                     </label>
                     <input
                       type="tel"
-                      value={userProfile.phone}
+                      value={userProfile?.phone ?? profile.phone}
                       readOnly
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white bg-gray-50"
                     />
@@ -350,7 +351,7 @@ export default function Dashboard() {
                     </label>
                     <input
                       type="text"
-                      value={userProfile.address}
+                      value={userProfile?.address ?? profile.address}
                       readOnly
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white bg-gray-50"
                     />
@@ -376,7 +377,7 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-slate-700">
                     <p className="text-gray-600 dark:text-gray-400">Membro desde</p>
                     <p className="font-bold text-gray-900 dark:text-white">
-                      {new Date(userProfile.joinDate).toLocaleDateString('pt-BR', {
+                      {new Date(userProfile?.joinDate ?? profile.joinDate).toLocaleDateString('pt-BR', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
@@ -386,13 +387,13 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-slate-700">
                     <p className="text-gray-600 dark:text-gray-400">Total de Agendamentos</p>
                     <p className="font-bold text-gray-900 dark:text-white">
-                      {userProfile.totalBookings}
+                      {userProfile?.totalBookings ?? profile.totalBookings}
                     </p>
                   </div>
                   <div className="flex justify-between items-center">
                     <p className="text-gray-600 dark:text-gray-400">Total Gasto</p>
                     <p className="font-bold text-gray-900 dark:text-white">
-                      {userProfile.totalSpent}
+                      {userProfile?.totalSpent ?? profile.totalSpent}
                     </p>
                   </div>
                 </div>

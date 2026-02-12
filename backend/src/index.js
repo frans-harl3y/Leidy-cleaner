@@ -105,7 +105,8 @@ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5, // Máximo 5 tentativas de login/signup em 15 min
   message: 'Muitas tentativas de acesso. Tente novamente em 15 minutos.',
-  resetOnSuccess: true // Reseta contador se sucesso
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
 const apiLimiter = rateLimit({

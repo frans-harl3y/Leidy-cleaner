@@ -54,7 +54,19 @@ async function refundPayment(stripePaymentId) {
 
 function constructEvent(body, signature) {
   if (!stripe) throw new Error('Stripe not configured');
-  return stripe.webhooks.constructEvent(body, signature, process.env.__PLACEHOLDER);
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET not configured');
+  
+  try {
+    return stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err) {
+    if (err.type === 'StripeSignatureVerificationError') {
+      const error = new Error('Invalid Stripe signature');
+      error.statusCode = 401;
+      throw error;
+    }
+    throw err;
+  }
 }
 
 module.exports = {

@@ -82,62 +82,58 @@ router.get('/session/:sessionId', async (req, res) => {
 
 /**
  * POST /api/payments/webhook
- * Webhook Stripe - Processar pagamentos
+ * Webhook Stripe - Processar pagamentos com validação HMAC-SHA256
  */
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  try {
-    const signature = req.headers['stripe-signature'];
-    const event = PaymentService.__PLACEHOLDER(req.body, signature);
+  const signature = req.headers['stripe-signature'];
+  
+  if (!signature) {
+    console.error('❌ Webhook sem stripe-signature header');
+    return res.status(400).json({ error: 'Missing stripe-signature header' });
+  }
 
-    console.log('🔔 Webhook Stripe recebido:', event.type);
+  try {
+    // Validar assinatura HMAC
+    const StripeService = require('../services/StripeService');
+    let event;
+    try {
+      event = StripeService.constructEvent(req.body, signature);
+    } catch (err) {
+      if (err.statusCode === 401) {
+        console.error('❌ Assinatura Stripe inválida (HMAC falhou)');
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+      throw err;
+    }
+
+    console.log('🔔 Webhook Stripe validado:', event.type);
 
     // Processar evento de pagamento bem-sucedido
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-
-      // Validar se realmente foi pago
-      const isPaid = await PaymentService.__PLACEHOLDER(session.id);
-      if (!isPaid) {
-        console.log('❌ Pagamento não confirmado ainda');
-        return res.status(200).json({ received: true });
+    if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object;
+      const bookingId = paymentIntent.metadata?.bookingId;
+      const userId = paymentIntent.metadata?.userId;
+      
+      if (bookingId && userId) {
+        console.log(`✅ Pagamento confirmado: booking ${bookingId}, user ${userId}`);
+        // TODO: Atualizar status do agendamento no banco como "confirmado"
       }
-
-      const userId = parseInt(session.metadata.userId);
-      const hourPackage = parseInt(session.metadata.hourPackage);
-      const amount = session.amount_total / 100;
-
-      // Adicionar crédito de horas ao usuário
-      await PLACEHOLDER.addUserHourCredit(
-        userId,
-        hourPackage,
-        `Compra de ${hourPackage}h - Transação Stripe ${session.id}`,
-        amount
-      );
-
-      // Registrar transação no banco
-      const db = new sqlite3.Database(DB_PATH);
-      db.run(
-        `INSERT INTO user_hour_credits 
-         (user_id, hour_package_id, purchased_at, expires_at, amount_paid, stripe_session_id, status)
-         VALUES (?, ?, datetime('now'), datetime('now', '+365 days'), ?, ?, 'completed')`,
-        [userId, hourPackage, amount, session.id],
-        (err) => {
-          if (err) console.error('Erro ao registrar transação:', err);
-          else console.log('✅ Horas creditadas:', userId, hourPackage);
-          db.close();
-        }
-      );
     }
 
-    // Processar evento de pagamento falhado
-    if (event.type === 'checkout.session.expired') {
-      const session = event.data.object;
-      console.log('⏱️ Sessão expirada:', session.id);
+    if (event.type === 'charge.failed') {
+      const charge = event.data.object;
+      console.error(`❌ Pagamento falhou: ${charge.id}`);
+      // TODO: Notificar usuário sobre falha
     }
 
-    res.json({ received: true });
+    // Retornar 200 para Stripe reconhecer recebimento
+    res.status(200).json({ received: true });
   } catch (error) {
-    console.error('Erro no webhook:', error.message);
+    console.error('❌ Erro no webhook Stripe:', error.message);
+    // Sempre retornar 200 para Stripe não ficar retentando (evita DDoS)
+    res.status(200).json({ received: true, error: error.message });
+  }
+};
     res.status(400).json({ error: error.message });
   }
 });

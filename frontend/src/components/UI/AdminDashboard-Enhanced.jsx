@@ -1,3 +1,8 @@
+/**
+ * Admin Dashboard com Gráficos
+ * Stats, charts, e relatórios em tempo real
+ */
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -10,14 +15,7 @@ import {
   ClockIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-
-try {
-  // Tentar importar Recharts para gráficos
-  const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } = require('recharts');
-  var ChartsAvailable = true;
-} catch (e) {
-  var ChartsAvailable = false;
-}
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -29,6 +27,7 @@ export function AdminDashboard() {
     pendingBookings: 8,
   });
 
+  // Dados de receita mensal
   const revenueData = [
     { month: 'Jan', revenue: 3200, target: 3500 },
     { month: 'Fev', revenue: 3800, target: 3500 },
@@ -38,12 +37,23 @@ export function AdminDashboard() {
     { month: 'Jun', revenue: 7280, target: 5500 },
   ];
 
+  // Dados de serviços mais populares
   const servicesData = [
     { name: 'Limpeza Residencial', value: 45 },
     { name: 'Limpeza Comercial', value: 32 },
     { name: 'Limpeza Profunda', value: 28 },
     { name: 'Limpeza Windows', value: 15 },
     { name: 'Carpete', value: 10 },
+  ];
+
+  // Dados de satisfação por mês
+  const satisfactionData = [
+    { month: 'Jan', satisfaction: 4.3 },
+    { month: 'Fev', satisfaction: 4.5 },
+    { month: 'Mar', satisfaction: 4.6 },
+    { month: 'Abr', satisfaction: 4.7 },
+    { month: 'Mai', satisfaction: 4.8 },
+    { month: 'Jun', satisfaction: 4.7 },
   ];
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -169,74 +179,124 @@ export function AdminDashboard() {
         </motion.div>
       </div>
 
-      {/* Charts Section */}
-      {ChartsAvailable ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Placeholder for charts - Recharts would go here */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700"
-          >
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              💰 Receita por Mês
-            </h3>
-            <div className="h-80 flex items-center justify-center text-gray-500">
-              <p>Gráfico de barras com Recharts (revenue vs target)</p>
-            </div>
-          </motion.div>
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        {/* Revenue Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700"
+        >
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            💰 Receita por Mês
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={revenueData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="revenue" fill="#3b82f6" name="Realizado" />
+              <Bar dataKey="target" fill="#10b981" name="Meta" />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
 
-          {/* Services Pie Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700"
-          >
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              🎯 Serviços Populares
-            </h3>
-            <div className="h-80 flex items-center justify-center text-gray-500">
-              <p>Gráfico de pizza com Recharts (serviços)</p>
-            </div>
-          </motion.div>
-        </div>
-      ) : null}
+        {/* Satisfaction Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700"
+        >
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            ⭐ Taxa de Satisfação
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={satisfactionData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis domain={[3, 5]} />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="satisfaction"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                name="Satisfação"
+                dot={{ fill: '#f59e0b', r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
 
-      {/* Top Services List */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700 mb-12"
-      >
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          🏆 Ranking de Serviços
-        </h3>
-        <div className="space-y-4">
-          {servicesData.map((service, idx) => (
-            <div key={idx} className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="font-semibold text-gray-900 dark:text-white">
-                  {idx + 1}. {service.name}
-                </p>
-                <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mt-1">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{
-                      width: `${(service.value / 50) * 100}%`
-                    }}
-                  />
+        {/* Services Pie Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700"
+        >
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            🎯 Serviços Populares
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={servicesData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {servicesData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </motion.div>
+
+        {/* Top Services List */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700"
+        >
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            🏆 Ranking de Serviços
+          </h3>
+          <div className="space-y-4">
+            {servicesData.map((service, idx) => (
+              <div key={idx} className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    {idx + 1}. {service.name}
+                  </p>
+                  <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mt-1">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
+                      style={{
+                        width: `${(service.value / 50) * 100}%`
+                      }}
+                    />
+                  </div>
                 </div>
+                <p className="ml-4 font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                  {service.value} bookings
+                </p>
               </div>
-              <p className="ml-4 font-bold text-gray-900 dark:text-white whitespace-nowrap">
-                {service.value} bookings
-              </p>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
 
       {/* Quick Actions */}
       <motion.div
@@ -266,5 +326,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-
-export default AdminDashboard;

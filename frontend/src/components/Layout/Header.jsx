@@ -19,13 +19,13 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 shadow-sm">
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 border-b border-blue-500/30 dark:border-blue-600/30 shadow-xl">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 sm:h-24">
           {/* Logo + Brand with Theme Image */}
           <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity group">
               {/* Brand Image - Circular with Border */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl overflow-hidden border-2 border-slate-300 dark:border-slate-600 hover:border-cyan-500 transition-all">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl overflow-hidden border-2 border-cyan-400 dark:border-cyan-500 hover:border-cyan-300 transition-all hover:shadow-cyan-500/50">
                 <Image 
                   src="/logo-leidy.svg" 
                   alt="Leidy Cleaner Brand" 
@@ -34,14 +34,14 @@ export default function Header() {
                   className="object-cover group-hover:scale-110 duration-500" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-300 rounded-full animate-pulse shadow-lg"></div>
               </div>
               {/* Text Brand */}
               <div>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white drop-shadow-sm">
+                <h1 className="text-xl sm:text-2xl font-black text-white drop-shadow-sm bg-gradient-to-r from-cyan-400 to-blue-300 bg-clip-text text-transparent">
                   Leidy Cleaner
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+                <p className="text-xs sm:text-sm text-cyan-200 dark:text-cyan-300 font-medium">
                   Limpeza Profissional Premium
                 </p>
               </div>
@@ -50,8 +50,8 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-2">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="px-4 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium flex items-center gap-2 group">
-                  <span className="group-hover:scale-125">{link.icon}</span>
+              <Link key={link.href} href={link.href} className="px-4 py-2 rounded-lg text-cyan-100 dark:text-cyan-200 hover:bg-blue-800/30 dark:hover:bg-blue-900/50 transition-all font-medium flex items-center gap-2 group hover:text-cyan-300">
+                  <span className="group-hover:scale-125 transition-transform">{link.icon}</span>
                   {link.label}
               </Link>
             ))}
@@ -63,7 +63,7 @@ export default function Header() {
           {/* Right Actions */}
           <div className="flex items-center gap-3 sm:gap-4">
             <ThemeSelector />
-            <Link href="/HourCheckout" className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 hover:shadow-lg text-white transition-all font-bold text-sm shadow-lg">
+            <Link href="/HourCheckout" className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 hover:shadow-lg hover:shadow-cyan-500/50 text-white transition-all font-bold text-sm shadow-lg duration-300">
                 <span>💰</span>
                 Comprar Horas
             </Link>
@@ -71,11 +71,11 @@ export default function Header() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+              className="lg:hidden p-3 hover:bg-blue-800/30 dark:hover:bg-blue-900/50 rounded-xl transition-all text-cyan-300"
               aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
             >
-              <svg className="w-6 h-6 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
               </svg>
             </button>
@@ -84,10 +84,10 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <nav className="lg:hidden pb-4 space-y-2 border-t border-slate-200 dark:border-slate-700/30 pt-4 animate-in fade-in slide-up">
+          <nav className="lg:hidden pb-4 space-y-2 border-t border-blue-500/30 dark:border-blue-600/30 pt-4 animate-in fade-in slide-up">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} 
-                  className="block px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-green-50 dark:hover:bg-slate-800 rounded-lg transition-colors font-medium flex items-center gap-2"
+                  className="block px-4 py-3 text-cyan-100 dark:text-cyan-200 hover:bg-blue-800/30 dark:hover:bg-blue-900/50 rounded-lg transition-colors font-medium flex items-center gap-2 hover:text-cyan-300"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <span>{link.icon}</span>
@@ -95,7 +95,7 @@ export default function Header() {
               </Link>
             ))}
             <Link href="/HourCheckout" 
-                className="block px-4 py-3 mt-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-bold text-center hover:shadow-lg transition-all"
+                className="block px-4 py-3 mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-bold text-center hover:shadow-lg transition-all hover:from-cyan-400 hover:to-blue-400"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 💰 Comprar Horas Agora
