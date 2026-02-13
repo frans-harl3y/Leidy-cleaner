@@ -47,7 +47,7 @@ export default function MyApp({ Component, pageProps }) {
     // Register PWA service worker
     try {
       if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').catch(e => console.log(e))
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {})
       }
     } catch (e) {
       // ignore

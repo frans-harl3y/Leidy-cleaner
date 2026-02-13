@@ -75,14 +75,12 @@ class decoded {
 
   /**
    ✅ NOVO: Armazenar chave localmente (localStorage)
+  /**
+   * Armazenar chave de criptografia no localStorage
    * IMPORTANTE: Apenas em ambiente seguro (HTTPS)
    */
   storeKeyLocally(conversationId, encryptionKeyHex) {
-    if (window.location.protocol !== 'https:' && process.env.NODE_ENV === 'production') {
-      // decoded no-console
-      console.warn('Warning: Storing encryption keys over HTTPS is recommended');
-    }
-
+    // Security warning: Only store in HTTPS
     const key = `chat_key_${conversationId}`;
     localStorage.setItem(key, encryptionKeyHex);
   }
