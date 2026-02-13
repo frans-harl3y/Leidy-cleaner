@@ -47,6 +47,9 @@
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --radius-2xl: 1.5rem;
+  /* Acento base (verde da marca) */
+  --accent: #22c55e;
+  --accent-rgb: 34,197,94;
   
   /* Transitions */
   --transition-base: all 0.3s ease;
@@ -555,6 +558,74 @@ select:focus-visible {
 
 .fade-in {
   animation: fadeIn 0.3s ease-in;
+}
+
+/* ============================================
+   🤖 TEMA CYBERPUNK
+   ============================================ */
+[data-theme="cyberpunk"],
+html.cyberpunk {
+  color-scheme: dark;
+  
+  --color-primary: #00d9ff;
+  --color-primary-light: #00ffff;
+  --color-primary-dark: #0099cc;
+  
+  --color-secondary: #ff006e;
+  
+  --color-bg: #0a0e27;
+  --color-bg-secondary: #1a1f3a;
+  --color-bg-tertiary: #2a2f4a;
+  --color-text: #00d9ff;
+  --color-text-secondary: #ff006e;
+  --color-text-tertiary: #00ffff;
+  
+  --color-border: #00d9ff;
+  --color-border-light: #0099cc;
+  
+  --color-success: #00ff00;
+  --color-warning: #ff9900;
+  --color-error: #ff0066;
+  
+  --shadow-xs: 0 0 10px rgba(0, 217, 255, 0.1);
+  --shadow-sm: 0 0 15px rgba(0, 217, 255, 0.2);
+  --shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+  --shadow-md: 0 0 30px rgba(0, 217, 255, 0.4);
+  --shadow-lg: 0 0 40px rgba(0, 217, 255, 0.5);
+}
+
+/* ============================================
+   🌲 TEMA FLORESTA (FOREST)
+   ============================================ */
+[data-theme="forest"],
+html.forest {
+  color-scheme: dark;
+  
+  --color-primary: #10b981;
+  --color-primary-light: #6ee7b7;
+  --color-primary-dark: #059669;
+  
+  --color-secondary: #34d399;
+  
+  --color-bg: #0f4620;
+  --color-bg-secondary: #1a5a32;
+  --color-bg-tertiary: #2a7a48;
+  --color-text: #d1fae5;
+  --color-text-secondary: #a7f3d0;
+  --color-text-tertiary: #6ee7b7;
+  
+  --color-border: #059669;
+  --color-border-light: #10b981;
+  
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #f87171;
+  
+  --shadow-xs: 0 2px 8px rgba(16, 185, 129, 0.1);
+  --shadow-sm: 0 4px 12px rgba(16, 185, 129, 0.2);
+  --shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+  --shadow-md: 0 12px 24px rgba(16, 185, 129, 0.4);
+  --shadow-lg: 0 16px 32px rgba(16, 185, 129, 0.3);
 }
 
 /* ============================================

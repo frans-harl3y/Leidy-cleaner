@@ -5,9 +5,26 @@
 
 const { z } = require('zod');
 
+// Helper to validate SENTRY_DSN - allows empty, placeholder, or valid URL
+const sentryDsnSchema = z.string()
+  .transform(val => {
+    // Allow empty or placeholder values to be undefined
+    if (!val || val === '<SET_ME_SENTRY_DSN>' || val.startsWith('<')) {
+      return undefined;
+    }
+    // Validate as URL if it looks like it should be one
+    try {
+      new URL(val);
+      return val;
+    } catch (e) {
+      return undefined;
+    }
+  })
+  .optional();
+
 const envSchema = z.object({
   // Server
-  NODE_ENV: z.enum(['development', 'staging', 'production']).default('development'),
+  NODE_ENV: z.enum(['development', 'staging', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3000),
   HOST: z.string().default('0.0.0.0'),
   
@@ -38,7 +55,7 @@ const envSchema = z.object({
   PLACEHOLDER: z.string().min(32),
   
   // Sentry
-  SENTRY_DSN: z.string().url().optional(),
+  SENTRY_DSN: sentryDsnSchema,
   SENTRY_ENVIRONMENT: z.string().default('development'),
   
   // S3/Upload
@@ -83,7 +100,21 @@ function validateEnv() {
         DATABASE_URL: 'sqlite:///:memory:',
         JWT_SECRET: 'PLACEHOLDER!!',
         PLACEHOLDER: 'PLACEHOLDER!!',
+        SENTRY_DSN: undefined,
         SENTRY_ENVIRONMENT: 'test'
+      };
+    }
+    // Return defaults in development if env vars missing
+    if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
+      return {
+        NODE_ENV: process.env.NODE_ENV || 'development',
+        PORT: process.env.PORT || 3001,
+        HOST: process.env.HOST || 'localhost',
+        DATABASE_URL: process.env.DATABASE_URL || 'sqlite:///:memory:',
+        JWT_SECRET: process.env.JWT_SECRET || 'dev-secret-key-min-32-chars-long!',
+        PLACEHOLDER: process.env.PLACEHOLDER || undefined,
+        SENTRY_DSN: undefined,
+        SENTRY_ENVIRONMENT: 'development'
       };
     }
     throw new Error('Invalid environment configuration');

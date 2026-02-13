@@ -15,6 +15,7 @@ import LiveChat from '../components/UI/LiveChat'
 import PushNotifications from '../components/UI/PushNotifications'
 import PWABanner from '../components/UI/PWABanner'
 import FloatingNavTools from '../components/UI/FloatingNavTools'
+import FloatingThemeSwitcher from '../components/UI/FloatingThemeSwitcher'
 import Script from 'next/script'
 import { useRouter } from 'next/router'
 import * as gtag from '../../lib/gtag'
@@ -71,6 +72,7 @@ export default function MyApp({ Component, pageProps }) {
               <LoyaltyProvider>
                 <NotificationSystem />
                   <FloatingNavTools />
+                  <FloatingThemeSwitcher />
                 <div className="min-h-[100vh] pb-20">
                   <div className="mobile-only">
                     <MobileTopBar />

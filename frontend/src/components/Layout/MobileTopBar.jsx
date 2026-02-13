@@ -13,7 +13,7 @@ export default function MobileTopBar() {
           <Link href="/">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 relative rounded-lg overflow-hidden">
-                <Image src="/images/logo.svg" alt="Leidy Cleaner" width={40} height={40} />
+                <Image src="https://leidycleaner.com.br/logo-leidy.png" alt="Leidy Cleaner" width={40} height={40} />
               </div>
               <div className="leading-tight">
                 <div className="text-sm font-black text-gray-900 dark:text-white">Leidy Cleaner</div>

@@ -50,8 +50,8 @@ export default function FeaturedServices() {
       icon: '🔄',
       description: 'Limpeza regular semanal ou mensal',
       details: 'Mantenha sua casa sempre impecável com serviços recorrentes personalizados',
-      price: 'Pacotes a partir de R$ 599/mês',
-      features: ['Semanal', 'Quinzenal', 'Mensal', 'Desconto especial'],
+      price: 'A partir de R$ 599/mês',
+      features: ['Semanal', 'Quinzenal', 'Mensal', 'Desconto para recorrência'],
       color: 'from-green-500 to-green-600',
       image: '/services/maintenance.jpg'
     }

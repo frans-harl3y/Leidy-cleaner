@@ -4,7 +4,6 @@
  */
 
 const Sentry = require('@sentry/node');
-const { PLACEHOLDER } = require('@sentry/profiling-node');
 const logger = require('../utils/logger');
 
 function initializeSentry(app) {

@@ -1,30 +1,54 @@
 #!/bin/bash
 
-# ============================================================
-# 💾 Database Backup Script
-# ============================================================
-# Faz backup da BD PostgreSQL e envia para S3
-# Setup em cron: 0 2 * * * /path/to/scripts/backup-database.sh
-# ============================================================
+###
+### Database Backup Script - Enhanced
+###
+### Creates automated PostgreSQL backups with rotation.
+###
+### Features:
+### - Automatic daily backups
+### - Compression (gzip)
+### - Retention policy (keep last 30 days)
+### - S3 upload (optional)
+### - Email notifications (optional)
+###
+### Setup:
+### 1. chmod +x scripts/backup-database.sh
+### 2. Add to crontab: 0 2 * * * /workspace/scripts/backup-database.sh
+###
+### Usage:
+### ./scripts/backup-database.sh
+### ./scripts/backup-database.sh --s3-bucket my-backups
+### ./scripts/backup-database.sh --keep-days 7
+###
 
 set -e
+
+# ===== CONFIGURATION =====
+BACKUP_DIR="${BACKUP_DIR:-.}/backups"
+RETENTION_DAYS="${RETENTION_DAYS:-30}"
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+BACKUP_FILE="${BACKUP_DIR}/chega-db-${TIMESTAMP}.sql"
+BACKUP_FILE_GZ="${BACKUP_FILE}.gz"
+
+# S3 Configuration (optional)
+S3_ENABLED="${S3_ENABLED:-false}"
+S3_BUCKET="${S3_BUCKET:-}"
 
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m'
-
-# Configuration
-BACKUP_DIR="${BACKUP_DIR:-./backups}"
-DB_URL="${DATABASE_URL:-postgresql://localhost/limpeza_pro}"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-RETENTION_DAYS="${[REDACTED_TOKEN]:-30}"
-AWS_S3_BUCKET="${AWS_S3_BUCKET:-limpeza-pro-backups}"
 
 # Log functions
 log() {
-  echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1" | tee -a "$BACKUP_DIR/backup.log"
+  echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1" | tee -a "$BACKUP_DIR/backup.log"
+}
+
+log_success() {
+  echo -e "${GREEN}[✓]${NC} $1" | tee -a "$BACKUP_DIR/backup.log"
 }
 
 error() {

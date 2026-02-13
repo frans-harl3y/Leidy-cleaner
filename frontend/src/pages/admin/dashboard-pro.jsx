@@ -101,9 +101,9 @@ export default function AdminDashboard() {
                 trend="+8% vs mês anterior"
               />
               <StatCard
-                icon="⏰"
-                title="Horas Vendidas"
-                value={`${stats.totalHoursSold}h`}
+                icon="💳"
+                title="Vendas Realizadas"
+                value={`${stats.totalHoursSold || 0}`}
                 trend="+15% vs mês anterior"
               />
               <StatCard
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
                   {tab === 'overview' && '📋 Overview'}
                   {tab === 'bookings' && '📅 Bookings'}
                   {tab === 'revenue' && '💰 Faturamento'}
-                  {tab === 'hours' && '⏰ Pacotes de Horas'}
+                  {tab === 'hours' && '💳 Pagamentos'}
                 </button>
               ))}
             </div>
@@ -260,21 +260,10 @@ export default function AdminDashboard() {
 
           {activeTab === 'hours' && (
             <div className="bg-gray-800 rounded-lg p-6">
-              <h2 className="text-xl font-bold mb-4">⏰ Vendas de Pacotes de Horas</h2>
-              <p className="text-gray-400 mb-4">Relatório de pacotes de horas vendidos</p>
+              <h2 className="text-xl font-bold mb-4">💳 Relatório de Pagamentos</h2>
+              <p className="text-gray-400 mb-4">Resumo de pagamentos recebidos via checkout</p>
               <div className="space-y-3">
-                {[40, 60, 80, 100, 120].map(hours => (
-                  <div key={hours} className="bg-gray-700 p-4 rounded flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold">{hours}h Package</p>
-                      <p className="text-sm text-gray-400">Pacote popular</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-400">48 vendidas</p>
-                      <p className="text-sm text-gray-400">R$ 12.000,00</p>
-                    </div>
-                  </div>
-                ))}
+                <p className="text-sm text-gray-400">Nenhum dado detalhado disponível no modo demo.</p>
               </div>
             </div>
           )}

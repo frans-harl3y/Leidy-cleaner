@@ -5,6 +5,12 @@ const WhatsAppButton = () => {
 
   useEffect(() => {
     const toggleVisibility = () => {
+      const isMobile = window.innerWidth <= 640;
+      if (isMobile) {
+        setIsVisible(true);
+        return;
+      }
+
       if (window.pageYOffset > 300) {
         setIsVisible(true);
       } else {
@@ -16,7 +22,7 @@ const WhatsAppButton = () => {
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  const phoneNumber = '5551990303740';
+  const phoneNumber = process?.env?.NEXT_PUBLIC_SUPPORT_PHONE || '5551990303740';
   const message = 'Olá! Gostaria de saber mais sobre os serviços de limpeza da Leidy Cleaner.';
 
   return (

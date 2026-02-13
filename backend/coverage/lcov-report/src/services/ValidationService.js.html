@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40.95% </span>
+                <span class="strong">41.9% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>43/105</span>
+                <span class='fraction'>44/105</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">32.94% </span>
+                <span class="strong">34.11% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>28/85</span>
+                <span class='fraction'>29/85</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">45.16% </span>
+                <span class="strong">48.38% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>14/31</span>
+                <span class='fraction'>15/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.34% </span>
+                <span class="strong">42.3% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>43/104</span>
+                <span class='fraction'>44/104</span>
             </div>
         
             
@@ -481,7 +481,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -798,8 +798,8 @@ class ValidationService {
   /**
    * Validar inteiro positivo (IDs, quantities)
    */
-<span class="fstat-no" title="function not covered" >  st</span>atic PLACEHOLDER(value, fieldName, max = <span class="branch-0 cbranch-no" title="branch not covered" >Number.MAX_SAFE_INTEGER)</span> {
-    const num = <span class="cstat-no" title="statement not covered" >this.__PLACEHOLDER(value, fieldName, max);</span>
+  static validatePositiveInteger(value, fieldName, max = Number.MAX_SAFE_INTEGER) {
+    const num = this.validatePositiveNumber(value, fieldName, max);
 <span class="cstat-no" title="statement not covered" >    if (!Number.isInteger(num)) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error(`${fieldName} deve ser um número inteiro`);</span>
     }
@@ -810,7 +810,7 @@ class ValidationService {
    * Validar rating (1-5)
    */
 <span class="fstat-no" title="function not covered" >  st</span>atic validateRating(value) {
-    const num = <span class="cstat-no" title="statement not covered" >this.__PLACEHOLDER(value, 'Rating', 5);</span>
+    const num = <span class="cstat-no" title="statement not covered" >this.validatePositiveInteger(value, 'Rating', 5);</span>
 <span class="cstat-no" title="statement not covered" >    if (num &lt; 1 || num &gt; 5) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('Rating deve ser entre 1 e 5');</span>
     }
@@ -917,12 +917,12 @@ class ValidationService {
       userId: {
         required: true,
         type: 'number',
-        validator: (v) =&gt; this.__PLACEHOLDER(v, 'userId')
+        validator: (v) =&gt; this.validatePositiveInteger(v, 'userId')
       },
       serviceId: {
         required: true,
         type: 'number',
-        validator: (v) =&gt; this.__PLACEHOLDER(v, 'serviceId')
+        validator: (v) =&gt; this.validatePositiveInteger(v, 'serviceId')
       },
       date: {
         required: true,
@@ -941,7 +941,7 @@ class ValidationService {
         validator: (v) =&gt; this.validatePhoneBR(v)
       },
       durationHours: {
-        validator: (v) =&gt; v ? this.__PLACEHOLDER(v, 'durationHours', 24) : <span class="branch-1 cbranch-no" title="branch not covered" >2</span>
+        validator: (v) =&gt; v ? this.validatePositiveInteger(v, 'durationHours', 24) : <span class="branch-1 cbranch-no" title="branch not covered" >2</span>
       }
     };
     
@@ -956,12 +956,12 @@ class ValidationService {
       bookingId: {
         required: true,
         type: 'number',
-        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.__PLACEHOLDER(v, 'bookingId')</span>
+        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.validatePositiveInteger(v, 'bookingId')</span>
       },
       userId: {
         required: true,
         type: 'number',
-        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.__PLACEHOLDER(v, 'userId')</span>
+        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.validatePositiveInteger(v, 'userId')</span>
       },
       rating: {
         required: true,
@@ -983,11 +983,11 @@ class ValidationService {
       bookingId: {
         required: true,
         type: 'number',
-        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.__PLACEHOLDER(v, 'bookingId')</span>
+        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.validatePositiveInteger(v, 'bookingId')</span>
       },
       amount: {
         required: true,
-        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.__PLACEHOLDER(v, 'amount', 99999.99)</span>
+        validator: <span class="fstat-no" title="function not covered" >(v</span>) =&gt; <span class="cstat-no" title="statement not covered" >this.validatePositiveNumber(v, 'amount', 99999.99)</span>
       },
       paymentMethod: {
         required: true,
@@ -1024,7 +1024,7 @@ module.exports = ValidationService;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-12T15:07:00.868Z
+                at 2026-02-13T04:50:27.213Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

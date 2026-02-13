@@ -44,15 +44,15 @@ export const trackCTAClick = (ctaName, ctaLocation) => {
 }
 
 // Rastrear início de compra
-export const trackBeginCheckout = (hourPackage, totalPrice) => {
+export const trackBeginCheckout = (bookingId, totalPrice) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'begin_checkout', {
       'event_category': 'ecommerce',
       'currency': 'BRL',
       'value': totalPrice,
       'items': [{
-        'item_id': `hours_${hourPackage}`,
-        'item_name': `${hourPackage} Horas de Limpeza`,
+        'item_id': `booking_${bookingId}`,
+        'item_name': `Pagamento booking ${bookingId}`,
         'price': totalPrice,
         'quantity': 1
       }]
@@ -61,7 +61,7 @@ export const trackBeginCheckout = (hourPackage, totalPrice) => {
 }
 
 // Rastrear compra completa
-export const trackPurchase = (orderId, hourPackage, totalPrice, taxes) => {
+export const trackPurchase = (orderId, bookingId, totalPrice, taxes) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'purchase', {
       'event_category': 'ecommerce',
@@ -70,8 +70,8 @@ export const trackPurchase = (orderId, hourPackage, totalPrice, taxes) => {
       'value': totalPrice,
       'tax': taxes,
       'items': [{
-        'item_id': `hours_${hourPackage}`,
-        'item_name': `${hourPackage} Horas de Limpeza`,
+        'item_id': `booking_${bookingId}`,
+        'item_name': `Pagamento booking ${bookingId}`,
         'price': totalPrice - taxes,
         'quantity': 1
       }]

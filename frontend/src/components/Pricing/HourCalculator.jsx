@@ -13,88 +13,59 @@ const HourCalculator = ({ onCalculate, userId }) => {
     complexity: 'low', // low, medium, high
   });
   const [priceResult, setPriceResult] = useState(null);
-  const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Buscar pacotes disponíveis ao montar
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  // Recalcular preço quando horas ou características mudam
+  // Recalcula o preço localmente sem depender de pacotes
   useEffect(() => {
     if (selectedHours > 0) {
       calculatePrice();
     }
   }, [selectedHours, characteristics]);
 
-  const fetchPackages = async () => {
+  const calculatePrice = () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/pricing/hour-packages');
-      const data = await response.json();
 
-      if (data.success) {
-        setPackages(data.packages);
-      } else {
-        setError(data.error || 'Erro ao buscar pacotes');
-      }
-    } catch (err) {
-      console.error('Erro ao buscar pacotes:', err);
-      setError('Erro ao conectar com o servidor');
-    } finally {
-      setLoading(false);
-    }
-  };
+      const baseRate = 60; // R$ por hora (estimativa local)
+      const complexityMultiplier =
+        characteristics.complexity === 'low'
+          ? 1
+          : characteristics.complexity === 'medium'
+          ? 1.2
+          : 1.5;
 
-  const calculatePrice = async () => {
-    try {
-      setLoading(true);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      
-      const response = await fetch('/api/pricing/calculate-hours', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` }),
+      const envMultiplier = 1 + Math.max(0, characteristics.environments - 1) * 0.02;
+      const peopleMultiplier = 1 + Math.max(0, characteristics.people - 1) * 0.01;
+
+      const basePrice =
+        selectedHours * baseRate * complexityMultiplier * envMultiplier * peopleMultiplier;
+
+      const serviceFee = basePrice * 0.4;
+      const postWorkFee = basePrice * 0.2;
+      const organizationFee = basePrice * 0.1;
+      const productFee = 50; // custo fixo estimado
+
+      const finalPrice = basePrice + serviceFee + postWorkFee + organizationFee + productFee;
+
+      const result = {
+        breakdown: {
+          basePrice,
+          serviceFee,
+          postWorkFee,
+          organizationFee,
+          productFee,
         },
-        body: JSON.stringify({
-          hours: selectedHours,
-          characteristics: characteristics,
-        }),
-      });
+        finalPrice,
+      };
 
-      const data = await response.json();
-
-      if (data.success) {
-        setPriceResult(data);
-        if (onCalculate) {
-          onCalculate(data);
-        }
-      } else {
-        setError(data.error || 'Erro ao calcular preço');
-      }
+      setPriceResult(result);
+      if (onCalculate) onCalculate(result);
     } catch (err) {
-      console.error('Erro ao calcular preço:', err);
-      setError('Erro ao calcular preço');
+      console.error('Erro ao calcular preço localmente:', err);
+      setError('Erro ao calcular estimativa');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const suggestPackage = async () => {
-    try {
-      const response = await fetch(
-        `/api/pricing/suggest-package?hoursNeeded=${selectedHours}`
-      );
-      const data = await response.json();
-
-      if (data.success && data.suggestedPackage) {
-        setSelectedHours(data.suggestedPackage.hours);
-      }
-    } catch (err) {
-      console.error('Erro ao sugerir pacote:', err);
     }
   };
 
@@ -137,13 +108,15 @@ const HourCalculator = ({ onCalculate, userId }) => {
             </div>
           </div>
 
-          {/* Botão Sugerir Pacote */}
-          <button
-            onClick={suggestPackage}
-            className="w-full mb-4 py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600 transition"
+          {/* Botão Ir para Pagamento (por booking) */}
+          <a
+            href={`/hour-checkout?bookingId=estimator&amount=${Math.ceil(
+              (priceResult && priceResult.finalPrice) || 0
+            )}`}
+            className="w-full inline-block mb-4 text-center py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700 transition"
           >
-            💡 Sugerir Pacote para {selectedHours}h
-          </button>
+            💳 Ir para Pagamento — R$ {priceResult ? Math.ceil(priceResult.finalPrice) : '0'}
+          </a>
 
           {/* Características */}
           <div className="space-y-4">
@@ -291,32 +264,7 @@ const HourCalculator = ({ onCalculate, userId }) => {
         </div>
       </div>
 
-      {/* PACOTES SUGERIDOS */}
-      {packages.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold text-green-800 mb-4">
-            Pacotes Disponíveis
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {packages.slice(0, 6).map((pkg) => (
-              <button
-                key={pkg.hours}
-                onClick={() => setSelectedHours(pkg.hours)}
-                className={`p-4 rounded-lg border-2 transition ${
-                  selectedHours === pkg.hours
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-300 bg-white hover:border-green-300'
-                }`}
-              >
-                <div className="font-bold text-lg text-green-700">{pkg.hours}h</div>
-                <div className="text-sm text-gray-600">
-                  R$ {pkg.totalPrice.toFixed(2)}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Removido: pacotes/sugestões — fluxo de pagamento por bookingId */}
     </div>
   );
 };

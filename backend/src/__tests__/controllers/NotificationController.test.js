@@ -203,7 +203,7 @@ describe('PLACEHOLDER', () => {
 
     test('should handle missing notification', async () => {
       if (typeof NotificationController.deleteNotification === 'function') {
-        db.get.__PLACEHOLDER((sql, params, callback) => {
+        db.get; // TODO_PLACEHOLDER((sql, params, callback) => {
           callback(null, null);
         });
         
@@ -310,7 +310,7 @@ describe('PLACEHOLDER', () => {
 
   describe('Error Handling', () => {
     test('should handle database errors', async () => {
-      db.run.__PLACEHOLDER((sql, params, callback) => {
+      db.run; // TODO_PLACEHOLDER((sql, params, callback) => {
         callback(new Error('Database error'));
       });
       
@@ -334,7 +334,7 @@ describe('PLACEHOLDER', () => {
     });
 
     test('should not expose sensitive data', async () => {
-      db.all.__PLACEHOLDER((sql, params, callback) => {
+      db.all; // TODO_PLACEHOLDER((sql, params, callback) => {
         callback(new Error('Connection string exposed'));
       });
       

@@ -1,31 +1,27 @@
 {
-  "name": "mmmm",
+  "name": "chega",
   "version": "1.0.0",
-  "description": "**Status: ✅ Produção-Ready — PCI-DSS Compliant, 100% Testes Passando**",
-  "main": "test-env.js",
+  "description": "Monorepo Leidy — frontend (Next.js) e backend (Express)",
+  "private": false,
+  "main": "backend/src/index.js",
+  "scripts": {
+    "start:backend": "npm --prefix backend run start",
+    "start:frontend": "npm --prefix frontend run start",
+    "build:frontend": "npm --prefix frontend run build",
+    "test:backend": "npm --prefix backend run test",
+    "test:frontend": "npm --prefix frontend run test",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test:backend && npm run test:frontend && npm run test:e2e",
+    "lint:backend": "npm --prefix backend run lint",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "lint": "npm run lint:backend && npm run lint:frontend"
+  },
+  "type": "commonjs",
+  "license": "MIT",
   "directories": {
     "doc": "docs"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/[REDACTED_TOKEN]/mmmm.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/[REDACTED_TOKEN]/mmmm/issues"
-  },
-  "homepage": "https://github.com/[REDACTED_TOKEN]/mmmm#readme",
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
-    "playwright": "^1.58.2"
-  },
-  "dependencies": {
-    "axe-core": "^4.11.1"
+    "@playwright/test": "^1.58.2"
   }
 }

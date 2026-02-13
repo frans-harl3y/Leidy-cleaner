@@ -56,17 +56,15 @@ export default function CheckoutSuccess() {
           Pagamento Confirmado!
         </h1>
 
-        <p className="text-gray-600 mb-6">
-          Suas horas de limpeza foram creditadas com sucesso.
-        </p>
+        <p className="text-gray-600 mb-6">Pagamento recebido — obrigado!</p>
 
         {sessionData && (
           <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-8 text-left">
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600">Pacote Adquirido</p>
+                <p className="text-sm text-gray-600">Booking ID</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {sessionData.metadata?.hourPackage}h
+                  {sessionData.metadata?.bookingId || '—'}
                 </p>
               </div>
               <div>

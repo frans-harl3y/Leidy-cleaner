@@ -14,14 +14,20 @@ const RedisService = require('./RedisService');
 // Criar fila de emails (tornar tolerante quando Redis não está disponível)
 let emailQueue;
 try {
+  const redisConfig = {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: process.env.REDIS_PORT || 6379,
+    enableReadyCheck: false,
+    enableOfflineQueue: false,
+  };
+  
+  // Apenas add password se não estiver vazia
+  if (process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD.trim()) {
+    redisConfig.password = process.env.REDIS_PASSWORD;
+  }
+  
   emailQueue = new Queue('email', {
-    redis: {
-      host: process.env.REDIS_HOST || 'localhost',
-      port: process.env.REDIS_PORT || 6379,
-      PLACEHOLDER: null,
-      enableReadyCheck: false,
-      enableOfflineQueue: false,
-    },
+    redis: redisConfig,
     defaultJobOptions: {
       attempts: 3,
       backoff: {

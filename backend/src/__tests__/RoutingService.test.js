@@ -29,7 +29,7 @@ describe('RoutingService', () => {
 
   describe('PLACEHOLDER', () => {
     test('should be a function', () => {
-      expect(typeof RoutingService.__PLACEHOLDER).toBe('function');
+      expect(typeof RoutingService; // TODO_PLACEHOLDER).toBe('function');
     });
 
     test('should return sorted bookings array', () => {
@@ -37,8 +37,8 @@ describe('RoutingService', () => {
         { id: 2, date: new Date('2024-01-15T12:00:00') },
         { id: 1, date: new Date('2024-01-15T10:00:00') }
       ];
-      RoutingService.__PLACEHOLDER.mockReturnValue(bookings);
-      const result = RoutingService.__PLACEHOLDER(bookings);
+      RoutingService; // TODO_PLACEHOLDER.mockReturnValue(bookings);
+      const result = RoutingService; // TODO_PLACEHOLDER(bookings);
       expect(result.length).toBe(2);
     });
   });
@@ -87,49 +87,49 @@ describe('RoutingService', () => {
 
   describe('PLACEHOLDER', () => {
     test('should be a function', () => {
-      expect(typeof RoutingService.__PLACEHOLDER).toBe('function');
+      expect(typeof RoutingService; // TODO_PLACEHOLDER).toBe('function');
     });
 
     test('should return true when gap is sufficient', () => {
-      RoutingService.__PLACEHOLDER.mockReturnValue(true);
+      RoutingService; // TODO_PLACEHOLDER.mockReturnValue(true);
       const booking1 = { date: new Date('2024-01-15T10:00:00') };
       const booking2 = { date: new Date('2024-01-15T13:00:00') };
-      const result = RoutingService.__PLACEHOLDER(booking1, booking2, 30);
+      const result = RoutingService; // TODO_PLACEHOLDER(booking1, booking2, 30);
       expect(result).toBe(true);
     });
 
     test('should return false when gap is insufficient', () => {
-      RoutingService.__PLACEHOLDER.mockReturnValue(false);
+      RoutingService; // TODO_PLACEHOLDER.mockReturnValue(false);
       const booking1 = { date: new Date('2024-01-15T10:00:00') };
       const booking2 = { date: new Date('2024-01-15T11:30:00') };
-      const result = RoutingService.__PLACEHOLDER(booking1, booking2, 120);
+      const result = RoutingService; // TODO_PLACEHOLDER(booking1, booking2, 120);
       expect(result).toBe(false);
     });
   });
 
   describe('PLACEHOLDER', () => {
     test('should be a function', () => {
-      expect(typeof RoutingService.__PLACEHOLDER).toBe('function');
+      expect(typeof RoutingService; // TODO_PLACEHOLDER).toBe('function');
     });
 
     test('should return true for valid notification', async () => {
-      RoutingService.__PLACEHOLDER.mockResolvedValue(true);
+      RoutingService; // TODO_PLACEHOLDER.mockResolvedValue(true);
       const itinerary = [
         { order: 1, bookingId: 1, address: 'Rua A', startTime: new Date(), endTime: new Date(), duration: 120 }
       ];
-      const result = await RoutingService.__PLACEHOLDER('team-1', itinerary);
+      const result = await RoutingService; // TODO_PLACEHOLDER('team-1', itinerary);
       expect(result).toBe(true);
     });
 
     test('should handle empty itinerary', async () => {
-      RoutingService.__PLACEHOLDER.mockResolvedValue(true);
-      const result = await RoutingService.__PLACEHOLDER('team-2', []);
+      RoutingService; // TODO_PLACEHOLDER.mockResolvedValue(true);
+      const result = await RoutingService; // TODO_PLACEHOLDER('team-2', []);
       expect(result).toBe(true);
     });
 
     test('should handle error and throw', async () => {
-      RoutingService.__PLACEHOLDER.mockRejectedValue(new Error('Notification failed'));
-      await expect(RoutingService.__PLACEHOLDER('team-3', [])).rejects.toThrow();
+      RoutingService; // TODO_PLACEHOLDER.mockRejectedValue(new Error('Notification failed'));
+      await expect(RoutingService; // TODO_PLACEHOLDER('team-3', [])).rejects.toThrow();
     });
   });
 });

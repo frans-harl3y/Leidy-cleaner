@@ -11,6 +11,13 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// ✅ NEW: Sentry error tracking (centralized logging)
+const SentryConfig = require('./config/sentry');
+// ✅ NEW: Database pooling (production optimized)
+const DatabasePool = require('./config/databasePool');
+// ✅ NEW: Redis cache strategy (TTL management)
+const cacheStrategy = require('./config/cacheStrategy');
+
 const apiRoutes = require('./routes/api');
 // const webhookRoutes = require('./routes/webhooks');
 const adminRoutes = require('./routes/admin');
@@ -33,6 +40,25 @@ const { initializeSwagger } = require('./config/swagger');
 validateEnv();
 
 const app = express();
+
+// ✅ INITIALIZE CACHE STRATEGY (Redis with TTLs)
+(async () => {
+  const cacheConnected = await cacheStrategy.init();
+  if (cacheConnected) {
+    app.locals.cache = cacheStrategy;
+  }
+})();
+
+// ✅ INITIALIZE DATABASE POOL (if using PostgreSQL)
+if (process.env.DATABASE_URL?.startsWith('postgresql')) {
+  try {
+    const pool = DatabasePool.createPool();
+    app.locals.db = pool;
+    logger.info('✅ Database pool created (production-optimized)');
+  } catch (err) {
+    logger.warn('Database pool failed - falling back to direct connection', err.message);
+  }
+}
 // ✅ CORRIGIDO: trust proxy configurado apenas se em produção com proxy real
 if (process.env.NODE_ENV === 'production' && process.env.TRUST_PROXY === 'true') {
   app.set('trust proxy', 1); // 1 = primeiro proxy
@@ -57,6 +83,14 @@ const chatService = new ChatService(io);
 
 // Inicializar CSRF (gera cookie XSRF-TOKEN em GETs e valida POSTs)
 initCsrf(app);
+
+// ✅ INITIALIZE SENTRY ERROR HANDLER
+try {
+  SentryConfig.initializeSentry(app);
+  app.locals.sentry = SentryConfig;
+} catch (err) {
+  logger.warn('Falha ao iniciar Sentry', err.message || err);
+}
 
 // Inicializar monitoramento (Sentry / NewRelic)
 try {
@@ -90,44 +124,68 @@ if (process.env.NODE_ENV === 'production') {
   app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true }));
 }
 
-// ✅ CORRIGIDO: Rate limiting - Global + Específicos por rota
+// ✅ PARAMETRIZADO: Rate limiting - Global + Específicos por rota
+const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'); // 15 min
+const RATE_LIMIT_MAX_REQUESTS = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100');
+const AUTH_LIMIT_MAX = parseInt(process.env.AUTH_LIMIT_MAX_REQUESTS || '5');
+const API_LIMIT_WINDOW = parseInt(process.env.API_LIMIT_WINDOW_MS || '60000'); // 1 min
+const API_LIMIT_MAX = parseInt(process.env.API_LIMIT_MAX_REQUESTS || '30');
+
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Limite 100 requisições por IP
+  windowMs: RATE_LIMIT_WINDOW,
+  max: RATE_LIMIT_MAX_REQUESTS,
   message: 'Muitas requisições deste IP, tente novamente mais tarde',
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.path === '/health'
+  skip: (req) => req.path === '/health' || req.path === '/health/db' || req.path === '/health/full'
 });
 
-// ✅ CORRIGIDO: Limites mais rigorosos para rotas sensíveis
+// ✅ PARAMETRIZADO: Limites mais rigorosos para rotas sensíveis
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5, // Máximo 5 tentativas de login/signup em 15 min
+  windowMs: RATE_LIMIT_WINDOW,
+  max: AUTH_LIMIT_MAX,
   message: 'Muitas tentativas de acesso. Tente novamente em 15 minutos.',
   standardHeaders: true,
   legacyHeaders: false
 });
 
 const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minuto
-  max: 30, // 30 requisições por minuto
+  windowMs: API_LIMIT_WINDOW,
+  max: API_LIMIT_MAX,
   message: 'Limite de requisições API excedido'
 });
 
 
-// CORS com configuração mais segura
+// ✅ PARAMETRIZADO: CORS com whitelist explícita
+const corsOrigin = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+  : ['http://localhost:3000', 'http://localhost:3001'];
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'http://localhost:3001'],
+  origin: corsOrigin,
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400 // 24 horas
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ✅ NOVO: Performance & Security Middleware
+const { 
+  compressionMiddleware, 
+  cacheControl, 
+  securityHeaders, 
+  responseTime 
+} = require('./middleware/performanceMiddleware');
+
+app.use(compressionMiddleware);           // Gzip compression
+app.use(cacheControl(3600));              // Cache headers (1 hour TTL for APIs)
+app.use(securityHeaders);                 // Security headers
+app.use(responseTime);                    // X-Response-Time header
 
 // ✅ NOVO: Middleware de logging (estruturado e automático)
 app.use(requestLogger);

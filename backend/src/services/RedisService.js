@@ -30,7 +30,7 @@ class RedisService {
 
       const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
       
-      this.client = redis.createClient({
+      const config = {
         url: redisUrl,
         socket: {
           reconnectStrategy: (retries) => {
@@ -42,7 +42,14 @@ class RedisService {
           },
           connectTimeout: 10000,
         },
-      });
+      };
+      
+      // Apenas add password se não estiver vazia
+      if (process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD.trim()) {
+        config.password = process.env.REDIS_PASSWORD;
+      }
+      
+      this.client = redis.createClient(config);
 
       // Event listeners
       this.client.on('connect', () => {

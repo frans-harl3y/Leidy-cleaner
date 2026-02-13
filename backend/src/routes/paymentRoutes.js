@@ -10,6 +10,8 @@ const { authenticateToken } = require('../middleware/auth');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
+const PaymentService = require('../services/PaymentService');
+
 // Database
 const DB_PATH = path.join(__dirname, '../../backend_data/database.db');
 
@@ -19,26 +21,15 @@ const DB_PATH = path.join(__dirname, '../../backend_data/database.db');
  */
 router.post('/create-checkout', authenticateToken, async (req, res) => {
   try {
-    const { hourPackage } = req.body;
+    const { bookingId, amount } = req.body;
     const userId = req.user.id;
 
-    // Validar pacote
-    const packages = PricingService.getHourPackages();
-    const selectedPackage = packages.find(p => p.hours === parseInt(hourPackage));
-
-    if (!selectedPackage) {
-      return res.status(400).json({
-        success: false,
-        error: 'Pacote de horas inválido'
-      });
+    if (!bookingId || !amount) {
+      return res.status(400).json({ success: false, error: 'bookingId e amount são obrigatórios' });
     }
 
-    // Criar sessão Stripe
-    const checkout = await PaymentService.createStripeCheckout(
-      userId,
-      hourPackage,
-      selectedPackage.totalPrice
-    );
+    // Criar sessão Stripe para pagamento da faxinha
+    const checkout = await PaymentService.createStripeCheckout(userId, bookingId, amount);
 
     if (!checkout.success) {
       return res.status(400).json(checkout);
@@ -69,8 +60,8 @@ router.get('/session/:sessionId', async (req, res) => {
     res.json({
       success: true,
       status: session.payment_status,
-      amount: session.amount_total / 100,
-      metadata: session.metadata
+      amount: (session.amount_total || 0) / 100,
+      metadata: session.metadata || {}
     });
   } catch (error) {
     res.status(400).json({
@@ -86,7 +77,7 @@ router.get('/session/:sessionId', async (req, res) => {
  */
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const signature = req.headers['stripe-signature'];
-  
+
   if (!signature) {
     console.error('❌ Webhook sem stripe-signature header');
     return res.status(400).json({ error: 'Missing stripe-signature header' });
@@ -113,7 +104,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       const paymentIntent = event.data.object;
       const bookingId = paymentIntent.metadata?.bookingId;
       const userId = paymentIntent.metadata?.userId;
-      
+
       if (bookingId && userId) {
         console.log(`✅ Pagamento confirmado: booking ${bookingId}, user ${userId}`);
         // TODO: Atualizar status do agendamento no banco como "confirmado"
@@ -127,14 +118,11 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     }
 
     // Retornar 200 para Stripe reconhecer recebimento
-    res.status(200).json({ received: true });
+    return res.status(200).json({ received: true });
   } catch (error) {
     console.error('❌ Erro no webhook Stripe:', error.message);
     // Sempre retornar 200 para Stripe não ficar retentando (evita DDoS)
-    res.status(200).json({ received: true, error: error.message });
-  }
-};
-    res.status(400).json({ error: error.message });
+    return res.status(200).json({ received: true, error: error.message });
   }
 });
 
@@ -151,8 +139,8 @@ router.get('/transactions', authenticateToken, async (req, res) => {
       date: new Date(s.created * 1000).toLocaleDateString('pt-BR'),
       amount: s.amount_total / 100,
       status: s.payment_status,
-      hourPackage: s.metadata?.hourPackage,
-      type: 'Compra de Horas'
+      bookingId: s.metadata?.bookingId,
+      type: 'Pagamento por Faxinha'
     }));
 
     res.json({

@@ -101,7 +101,7 @@ export default function AdvancedFAQ() {
           {/* Search Bar */}
           <div className="relative mb-8 max-w-2xl mx-auto">
             <div className="absolute left-4 top-1/2 -translate-y-1/2">
-              <img src="/icon-brand.jpg" alt="logo" className="w-6 h-6 rounded-full" />
+              <img src="https://leidycleaner.com.br/logo-leidy.png" alt="Leidy Logo" className="w-6 h-6 rounded-full" />
             </div>
             <input
               type="text"

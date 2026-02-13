@@ -24,7 +24,7 @@ export default function Home() {
                 Sua Casa <span className="text-cyan-400">Impecável</span>
               </h1>
               <p className="text-xl text-cyan-100 mb-8 max-w-2xl mx-auto">
-                Compre horas de limpeza conforme necessário. Sem planos, sem compromisso.
+                Pague pelo serviço quando precisar — rápido, seguro e sem complicação.
               </p>
               <div className="flex gap-4 flex-wrap justify-center">
                 <Link href="/agendar">
@@ -34,7 +34,7 @@ export default function Home() {
                 </Link>
                 <Link href="/HourCheckout">
                   <button className="px-8 py-4 rounded-xl border-2 border-cyan-400 text-white font-bold text-lg hover:bg-cyan-400/10 transition-all">
-                    💰 Comprar Horas
+                    💳 Pagar Faxinha
                   </button>
                 </Link>
               </div>
@@ -42,7 +42,7 @@ export default function Home() {
 
             {/* SERVIÇOS */}
             <section className="mb-24">
-              <h2 className="text-4xl font-black text-white text-center mb-12 drop-shadow-lg">Serviços por Hora</h2>
+              <h2 className="text-4xl font-black text-white text-center mb-12 drop-shadow-lg">Serviços</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
                   { icon: '🧼', name: 'Limpeza Residencial', desc: 'Regular e manutenção' },
@@ -63,7 +63,7 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                   { icon: '🏠', number: '15K+', label: 'Imóveis' },
-                  { icon: '⏰', number: '50K+', label: 'Horas' },
+                  { icon: '⏰', number: '50K+', label: 'Serviços' },
                   { icon: '👥', number: '2.5K+', label: 'Clientes' },
                   { icon: '🌟', number: '4.9★', label: 'Rating' }
                 ].map((stat, idx) => (
@@ -87,7 +87,7 @@ export default function Home() {
                 </Link>
                 <Link href="/HourCheckout">
                   <button className="px-10 py-4 rounded-xl border-2 border-white text-white font-bold text-lg hover:bg-white/10">
-                    💰 Comprar Horas
+                    💳 Pagar Faxinha
                   </button>
                 </Link>
               </div>

@@ -560,7 +560,19 @@
 <a name='L495'></a><a href='#L495'>495</a>
 <a name='L496'></a><a href='#L496'>496</a>
 <a name='L497'></a><a href='#L497'>497</a>
-<a name='L498'></a><a href='#L498'>498</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a>
+<a name='L508'></a><a href='#L508'>508</a>
+<a name='L509'></a><a href='#L509'>509</a>
+<a name='L510'></a><a href='#L510'>510</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -676,6 +688,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1158,11 +1182,11 @@ class BookingController {
         status: 'pending'
       };
 &nbsp;
-      const priceCalc = <span class="cstat-no" title="statement not covered" >PLACEHOLDER(booking, service);</span>
+      const priceCalc = <span class="cstat-no" title="statement not covered" >generatePriceSummary(booking, service);</span>
 <span class="cstat-no" title="statement not covered" >      booking.base_price = priceCalc.basePrice;</span>
 <span class="cstat-no" title="statement not covered" >      booking.extra_quarter_hours = priceCalc.extraQuarter;</span>
 <span class="cstat-no" title="statement not covered" >      booking.staff_fee = priceCalc.staffFee;</span>
-<span class="cstat-no" title="statement not covered" >      booking.__PLACEHOLDER = priceCalc.postWorkAdjustment;</span>
+<span class="cstat-no" title="statement not covered" >      booking.post_work_adjustment = priceCalc.postWorkAdjustment;</span>
 <span class="cstat-no" title="statement not covered" >      booking.final_price = priceCalc.finalPrice;</span>
 &nbsp;
       // ✅ Aplicar bônus de fidelidade
@@ -1175,13 +1199,25 @@ class BookingController {
       const result = <span class="cstat-no" title="statement not covered" >await db.run(`INSERT INTO bookings (</span>
           user_id, service_id, date, time, duration_hours,
           address, phone, base_price, extra_quarter_hours,
-          staff_fee, PLACEHOLDER, final_price,
+          staff_fee, post_work_adjustment, final_price,
           is_post_work, has_extra_quarter, status, notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, validated.userId, validated.serviceId, validated.date, validated.time, 
-      validated.durationHours, validated.address, validated.phone,
-      booking.base_price, booking.extra_quarter_hours,
-      booking.staff_fee, booking.__PLACEHOLDER, booking.final_price,
-      booking.is_post_work, booking.has_extra_quarter, 'pending', sanitizedNotes);
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        validated.userId, 
+        validated.serviceId, 
+        validated.date, 
+        validated.time, 
+        validated.durationHours, 
+        validated.address, 
+        validated.phone,
+        booking.base_price, 
+        booking.extra_quarter_hours,
+        booking.staff_fee, 
+        booking.post_work_adjustment, 
+        booking.final_price,
+        booking.is_post_work, 
+        booking.has_extra_quarter, 
+        'pending', 
+        sanitizedNotes);
 &nbsp;
       // ✅ Invalidar cache
 <span class="cstat-no" title="statement not covered" >      CacheService.invalidatePattern(`user:${validated.userId}:*`);</span>
@@ -1201,7 +1237,7 @@ class BookingController {
       // ✅ Enfileirar email de confirmação (assíncrono - não bloqueia resposta)
 <span class="cstat-no" title="statement not covered" >      if (user.email) {</span>
 <span class="cstat-no" title="statement not covered" >        try {</span>
-<span class="cstat-no" title="statement not covered" >          await EmailQueueService.__PLACEHOLDER(</span>
+<span class="cstat-no" title="statement not covered" >          await EmailQueueService.queueBookingConfirmation(</span>
             user.email,
             user.name || user.full_name,
             {
@@ -1518,7 +1554,7 @@ class BookingController {
   /**
    * Criar agendamento recorrente
    */
-<span class="fstat-no" title="function not covered" >  as</span>ync PLACEHOLDER(req, res) {
+<span class="fstat-no" title="function not covered" >  as</span>ync createRecurringBooking(req, res) {
     const db = <span class="cstat-no" title="statement not covered" >await getDb();</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const { userId } = <span class="cstat-no" title="statement not covered" >req.user;</span>
@@ -1561,7 +1597,7 @@ module.exports = new BookingController();
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-12T15:07:00.868Z
+                at 2026-02-13T04:50:27.213Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

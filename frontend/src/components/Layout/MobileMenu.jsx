@@ -13,7 +13,7 @@ export default function MobileMenu() {
 
   const menuItems = [
     { name: 'Como Funciona', href: '#como_funciona' },
-    { name: 'Pacotes', href: '#pacotes' },
+    { name: 'Serviços', href: '#servicos' },
     { name: 'Galeria', href: '#galeria' },
     { name: 'Blog', href: '/blog' },
     { name: 'Contato', href: '#contato' }
@@ -59,9 +59,9 @@ export default function MobileMenu() {
               <Link
                 href="/HourCheckout"
                 onClick={() => setIsOpen(false)}
-                className="block w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:shadow-lg transition font-bold text-center"
+                className="block w-full px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-lg hover:shadow-lg transition font-bold text-center"
               >
-                Comprar Horas
+                Pagar Faxinha
               </Link>
             </div>
           </div>

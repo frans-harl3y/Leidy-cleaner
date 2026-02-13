@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { ThemeContext } from '../../context/ThemeContext'
 
 export default function MobileBottomNav() {
   const router = useRouter()
+  const { cycleTheme, themeConfig } = useContext(ThemeContext)
 
   const isActive = (path) => router.pathname === path
 
@@ -53,6 +55,11 @@ export default function MobileBottomNav() {
             <span className="mt-1">Conta</span>
           </div>
         </Link>
+        {/* Compact theme cycle button (mobile) */}
+        <button onClick={() => cycleTheme()} aria-label="Alternar tema" className="py-3 flex flex-col items-center justify-center text-sm transition-colors text-gray-700 hover:bg-gray-50">
+          <div className="h-6 w-6 flex items-center justify-center rounded-full bg-green-600 text-white">{themeConfig?.icon || '🎨'}</div>
+          <span className="mt-1">Tema</span>
+        </button>
       </div>
     </nav>
   )

@@ -5,6 +5,7 @@
 
 const express = require('express');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const { asyncHandler, AppError } = require('../middleware/globalErrorHandler');
 const PixPaymentController = require('../controllers/PixPaymentController');
 
 /**
@@ -24,9 +25,9 @@ function createPixRoutes(db) {
    * @param {number} amount - Valor em reais
    * @returns {object} QR Code, BR Code, transaction ID, etc
    */
-  router.post('/create', authenticateToken, (req, res) => {
+  router.post('/create', authenticateToken, asyncHandler(async (req, res) => {
     pixController.createPixPayment(req, res);
-  });
+  }));
 
   /**
    * @route GET /api/pix/status/:transactionId
@@ -35,9 +36,9 @@ function createPixRoutes(db) {
    * @param {string} transactionId - ID da transação
    * @returns {object} Status, amount, datas, etc
    */
-  router.get('/status/:transactionId', authenticateToken, (req, res) => {
+  router.get('/status/:transactionId', authenticateToken, asyncHandler(async (req, res) => {
     pixController.getPaymentStatus(req, res);
-  });
+  }));
 
   /**
    * @route GET /api/pix/user/payments
@@ -45,9 +46,9 @@ function createPixRoutes(db) {
    * @access Private (usuário autenticado)
    * @returns {array} Lista de pagamentos
    */
-  router.get('/user/payments', authenticateToken, (req, res) => {
+  router.get('/user/payments', authenticateToken, asyncHandler(async (req, res) => {
     pixController.getUserPayments(req, res);
-  });
+  }));
 
   /**
    * @route POST /api/pix/webhooks
@@ -67,9 +68,9 @@ function createPixRoutes(db) {
     legacyHeaders: false
   });
 
-  router.post('/webhooks', rawBodyMiddleware(), webhookLimiter, (req, res) => {
+  router.post('/webhooks', rawBodyMiddleware(), webhookLimiter, asyncHandler(async (req, res) => {
     pixController.handleWebhook(req, res);
-  });
+  }));
 
   /**
    * @route POST /api/pix/expire/:transactionId
@@ -78,9 +79,9 @@ function createPixRoutes(db) {
    * @param {string} transactionId - ID da transação
    * @returns {object} Confirmação da expiração
    */
-  router.post('/expire/:transactionId', authenticateToken, (req, res) => {
+  router.post('/expire/:transactionId', authenticateToken, asyncHandler(async (req, res) => {
     pixController.expirePayment(req, res);
-  });
+  }));
 
   return router;
 }

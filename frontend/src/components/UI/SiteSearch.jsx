@@ -23,7 +23,7 @@ export default function SiteSearch({ className = '' }) {
       {/* Desktop inline search */}
       <form onSubmit={onSubmit} className={`relative hidden md:flex items-center ${className}`}>
         <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-          <Image src="/icon-brand.jpg" alt="logo" width={20} height={20} className="rounded-full" />
+          <Image src="https://leidycleaner.com.br/logo-leidy.png" alt="Leidy Logo" width={20} height={20} className="rounded-full" />
         </div>
         <input
           aria-label="Buscar no site"
@@ -47,7 +47,7 @@ export default function SiteSearch({ className = '' }) {
           <div className="fixed inset-0 z-50 bg-black/40 flex items-start pt-24 px-4">
             <div className="w-full max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-xl p-4 shadow-xl">
               <form onSubmit={onSubmit} className="flex items-center gap-3">
-                <img src="/icon-brand.jpg" alt="logo" className="w-8 h-8 rounded-full" />
+                <img src="https://leidycleaner.com.br/logo-leidy.png" alt="Leidy Logo" className="w-8 h-8 rounded-full" />
                 <input
                   autoFocus
                   value={q}

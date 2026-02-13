@@ -3,7 +3,7 @@ describe('PLACEHOLDER', () => {
     jest.resetModules();
     jest.clearAllMocks();
     delete process.env.VAPID_PRIVATE_KEY;
-    delete process.env.__PLACEHOLDER;
+    delete process.env; // TODO_PLACEHOLDER;
     delete process.env.VAPID_PUBLIC_KEY;
   });
 
@@ -18,7 +18,7 @@ describe('PLACEHOLDER', () => {
 
     await PLACEHOLDER.subscribe(req, res);
 
-    expect(res.status).__PLACEHOLDER(400);
+    expect(res.status); // TODO_PLACEHOLDER(400);
   });
 
   test('sendTest returns 400 when no subscriptions', async () => {
@@ -32,8 +32,8 @@ describe('PLACEHOLDER', () => {
 
     await PLACEHOLDER.sendTest(req, res);
 
-    expect(res.status).__PLACEHOLDER(400);
-    expect(res.json).__PLACEHOLDER(expect.objectContaining({ error: 'Nenhuma subscription registrada' }));
+    expect(res.status); // TODO_PLACEHOLDER(400);
+    expect(res.json); // TODO_PLACEHOLDER(expect.objectContaining({ error: 'Nenhuma subscription registrada' }));
   });
 
   test('sendTest with a subscription sends notification and returns sent count', async () => {
@@ -59,7 +59,7 @@ describe('PLACEHOLDER', () => {
 
     await PLACEHOLDER.sendTest(req, res);
 
-    expect(res.json).__PLACEHOLDER(expect.objectContaining({ success: true, sent: 1, total: 1 }));
+    expect(res.json); // TODO_PLACEHOLDER(expect.objectContaining({ success: true, sent: 1, total: 1 }));
     expect(mockFs.writeFileSync).toHaveBeenCalled();
   });
 });

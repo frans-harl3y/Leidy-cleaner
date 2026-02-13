@@ -301,22 +301,54 @@ a:hover {
   cursor: not-allowed;
 }
 
-/* Primary Button */
+/* Primary Button - CHAMATIVO CTA */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .btn-primary {
-  background-color: var(--primary-900);
+  /* Vibrant gradient + subtle glossy effect */
+  background-image: linear-gradient(90deg, #ff7a18 0%, #af002d 35%, #5b2a86 65%, #0f172a 100%);
+  background-size: 200% 200%;
   color: var(--text-inverse);
-  box-shadow: var(--shadow-sm);
+  padding: 0.9rem 1.9rem;
+  font-size: 1.05rem;
+  border-radius: 999px; /* pill */
+  box-shadow: 0 6px 18px rgba(175, 0, 45, 0.18), 0 2px 6px rgba(15,23,42,0.08), 0 0 20px rgba(95, 12, 160, 0.08) inset;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+  transform: translateZ(0);
+  transition: transform 220ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms var(--transition-sm), filter 220ms var(--transition-sm);
+  will-change: transform, box-shadow;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--primary-800);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  animation: gradientShift 3.5s ease infinite;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(175, 0, 45, 0.22), 0 6px 16px rgba(15,23,42,0.12), 0 0 36px rgba(95, 12, 160, 0.12);
+  filter: saturate(1.08) contrast(1.02);
 }
 
 .btn-primary:active:not(:disabled) {
-  background-color: var(--primary-700);
-  transform: translateY(0);
+  transform: translateY(-1px) scale(0.995);
+  box-shadow: 0 6px 16px rgba(15,23,42,0.12);
+}
+
+/* Optional glowing CTA variant for special actions */
+.btn-cta-glow {
+  background-image: linear-gradient(90deg, #ff9a3c 0%, #ff3d6f 50%, #7b2cff 100%);
+  color: white;
+  box-shadow: 0 8px 30px rgba(123,44,255,0.18), 0 4px 12px rgba(255,61,111,0.12);
+  border-radius: 14px;
+  padding: 1rem 1.8rem;
+  transition: transform 180ms var(--transition-sm), box-shadow 180ms var(--transition-sm);
+}
+
+.btn-cta-glow:hover:not(:disabled) {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 20px 50px rgba(123,44,255,0.28), 0 8px 20px rgba(255,61,111,0.16);
 }
 
 /* Secondary Button */

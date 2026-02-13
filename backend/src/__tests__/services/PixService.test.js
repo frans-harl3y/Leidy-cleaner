@@ -189,7 +189,7 @@ describe('PixService', () => {
   describe('PLACEHOLDER', () => {
     it('deve construir MAI corretamente', () => {
       const pixKey = 'teste@pix.com';
-      const mai = PixService.__PLACEHOLDER(pixKey);
+      const mai = PixService; // TODO_PLACEHOLDER(pixKey);
 
       expect(mai).toBe('0014br.gov.bcb.pix0113teste@pix.com');
     });
@@ -197,19 +197,19 @@ describe('PixService', () => {
 
   describe('PLACEHOLDER', () => {
     it('deve construir ADF com referência e descrição', () => {
-      const adf = PixService.__PLACEHOLDER('Teste descrição', 'REF123');
+      const adf = PixService; // TODO_PLACEHOLDER('Teste descrição', 'REF123');
 
       expect(adf).toBe('0506REF1239915Teste descrição');
     });
 
     it('deve construir ADF apenas com referência', () => {
-      const adf = PixService.__PLACEHOLDER('', 'REF123');
+      const adf = PixService; // TODO_PLACEHOLDER('', 'REF123');
 
       expect(adf).toBe('0506REF123');
     });
 
     it('deve construir ADF apenas com descrição', () => {
-      const adf = PixService.__PLACEHOLDER('Descrição', '');
+      const adf = PixService; // TODO_PLACEHOLDER('Descrição', '');
 
       expect(adf).toBe('9909Descrição');
     });
