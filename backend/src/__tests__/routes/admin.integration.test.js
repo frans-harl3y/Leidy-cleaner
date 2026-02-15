@@ -1,4 +1,4 @@
-.**
+/**
  * Admin Routes Integration Tests
  * Testa as rotas administrativas da API
  */
