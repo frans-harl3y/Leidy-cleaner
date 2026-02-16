@@ -4,9 +4,9 @@
  */
 
 const SmartAvailabilityService = require('../services/SmartAvailabilityService');
-const DynamicPricingService = require('../services/DynamicPricingService');
+const PricingService = require('../services/PricingService');
 const IntelligentCrossSellingService = require('../services/IntelligentCrossSellingService');
-const AdvancedAnalyticsService = require('../services/AdvancedAnalyticsService');
+const AnalyticsService = require('../services/AnalyticsService');
 const StaffOptimizationService = require('../services/StaffOptimizationService');
 const logger = require('../utils/logger');
 
@@ -126,7 +126,7 @@ class SmartFeaturesController {
         });
       }
 
-      const pricing = await DynamicPricingService.calculateDynamicPrice({
+      const pricing = await PricingService.calculateAdvancedDynamicPrice({
         serviceId,
         date,
         time,
@@ -157,7 +157,7 @@ class SmartFeaturesController {
         return res.status(400).json({ error: 'serviceId is required' });
       }
 
-      const forecast = await DynamicPricingService.getPriceForecast(
+      const forecast = await PricingService.getPriceForecast(
         serviceId,
         parseInt(days)
       );
@@ -245,7 +245,7 @@ class SmartFeaturesController {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
-      const dashboard = await AdvancedAnalyticsService.getExecutiveDashboard({
+      const dashboard = await AnalyticsService.getExecutiveDashboard({
         daysBack: parseInt(daysBack)
       });
 
@@ -271,7 +271,7 @@ class SmartFeaturesController {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
-      const analysis = await AdvancedAnalyticsService.getChurnAnalysis(60);
+      const analysis = await AnalyticsService.getChurnAnalysis(60);
 
       res.json({
         success: true,
@@ -295,7 +295,7 @@ class SmartFeaturesController {
         return res.status(403).json({ error: 'Unauthorized' });
       }
 
-      const forecast = await AdvancedAnalyticsService.getDemandForecast();
+      const forecast = await AnalyticsService.getDemandForecast();
 
       res.json({
         success: true,

@@ -6,14 +6,14 @@
 const DatabaseOptimizationService = require('../services/DatabaseOptimizationService');
 const logger = require('../utils/logger');
 
-class PLACEHOLDER {
+class DatabaseOptimizationController {
   /**
    * GET /api/db/query-report
    * Relatório de performance de queries
    */
   static async getQueryReport(req, res) {
     try {
-      const report = PLACEHOLDER.getQueryReport();
+      const report = DatabaseOptimizationService.getQueryReport();
       return res.json({
         success: true,
         data: report
@@ -31,7 +31,7 @@ class PLACEHOLDER {
   static async getSlowQueries(req, res) {
     try {
       const { threshold = 100 } = req.query;
-      const slowQueries = await PLACEHOLDER.detectSlowQueries(null, parseInt(threshold));
+      const slowQueries = await DatabaseOptimizationService.detectSlowQueries(null, parseInt(threshold));
       
       return res.json({
         success: true,
@@ -55,7 +55,7 @@ class PLACEHOLDER {
         return res.status(400).json({ error: 'Query é obrigatória' });
       }
 
-      const analysis = await PLACEHOLDER.analyzeQuery(query, params || []);
+      const analysis = await DatabaseOptimizationService.analyzeQuery(query, params || []);
       
       return res.json({
         success: true,
@@ -81,7 +81,7 @@ class PLACEHOLDER {
    */
   static async suggestIndices(req, res) {
     try {
-      const suggestions = PLACEHOLDER.suggestIndices();
+      const suggestions = DatabaseOptimizationService.suggestIndices();
 
       return res.json({
         success: true,
@@ -105,7 +105,7 @@ class PLACEHOLDER {
    */
   static async analyzeIndexUsage(req, res) {
     try {
-      const analysis = await PLACEHOLDER.analyzeIndexUsage(null);
+      const analysis = await DatabaseOptimizationService.analyzeIndexUsage(null);
 
       return res.json({
         success: true,
@@ -141,7 +141,7 @@ class PLACEHOLDER {
    */
   static async vacuumDatabase(req, res) {
     try {
-      const result = await PLACEHOLDER.vacuumDatabase(null);
+      const result = await DatabaseOptimizationService.vacuumDatabase(null);
 
       return res.json({
         success: true,
@@ -159,7 +159,7 @@ class PLACEHOLDER {
    */
   static async optimizeTables(req, res) {
     try {
-      const result = await PLACEHOLDER.optimizeTables(null);
+      const result = await DatabaseOptimizationService.optimizeTables(null);
 
       return res.json({
         success: true,
@@ -177,7 +177,7 @@ class PLACEHOLDER {
    */
   static async getTableSizes(req, res) {
     try {
-      const sizes = await PLACEHOLDER.getTableSizes(null);
+      const sizes = await DatabaseOptimizationService.getTableSizes(null);
 
       return res.json({
         success: true,
@@ -195,11 +195,11 @@ class PLACEHOLDER {
    */
   static async getDatabaseStats(req, res) {
     try {
-      const report = PLACEHOLDER.getQueryReport();
-      const slowQueries = await PLACEHOLDER.detectSlowQueries(null, 100);
-      const indices = await PLACEHOLDER.analyzeIndexUsage(null);
-      const sizes = await PLACEHOLDER.getTableSizes(null);
-      const integrity = await PLACEHOLDER.__PLACEHOLDER(null);
+      const report = DatabaseOptimizationService.getQueryReport();
+      const slowQueries = await DatabaseOptimizationService.detectSlowQueries(null, 100);
+      const indices = await DatabaseOptimizationService.analyzeIndexUsage(null);
+      const sizes = await DatabaseOptimizationService.getTableSizes(null);
+      const integrity = await DatabaseOptimizationService.checkIntegrity(null);
 
       return res.json({
         success: true,
@@ -225,7 +225,7 @@ class PLACEHOLDER {
    */
   static async resetStatistics(req, res) {
     try {
-      PLACEHOLDER.resetStatistics();
+      DatabaseOptimizationService.resetStatistics();
 
       return res.json({
         success: true,

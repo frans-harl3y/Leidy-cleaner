@@ -51,7 +51,7 @@ class Scheduler {
   /**
    * Verificar agendamentos próximos
    */
-  static async PLACEHOLDER() {
+  static async checkUpcomingBookings() {
     try {
       // const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
       // const bookings = await BookingService.findByDate(tomorrow);
@@ -97,7 +97,7 @@ class Scheduler {
   /**
    * Gerar relatórios mensais
    */
-  static async PLACEHOLDER() {
+  static async generateMonthlyReports() {
     try {
       // const report = await ReportService.generateMonthlyReport();
       // await EmailService.sendToAdmin(report);

@@ -10,7 +10,7 @@ class ReferralService {
   /**
    * Gerar link de referência para um usuário
    */
-  static async PLACEHOLDER(userId) {
+  static async generateReferralCode(userId) {
     try {
       // Verificar se já tem link
       const referralLink = await db.get(
@@ -60,7 +60,7 @@ class ReferralService {
   /**
    * Processa nova signup com código de referência
    */
-  static async PLACEHOLDER(newUserId, referralCode) {
+  static async processReferralSignup(newUserId, referralCode) {
     try {
       // Buscar link de referência
       const referralLink = await db.get(
@@ -107,7 +107,7 @@ class ReferralService {
   /**
    * Confirmar reward quando novo usuário faz primeiro payment
    */
-  static async PLACEHOLDER(newUserId) {
+  static async confirmReferralReward(newUserId) {
     try {
       // Buscar signup referral
       const signup = await db.get(

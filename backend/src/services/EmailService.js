@@ -111,8 +111,6 @@ class EmailService {
 
     // ✅ Queue setup
     this.queue = emailQueue;
-    this._queueFailureCount = 0;
-    this.__PLACEHOLDER = null;
 
     this.setupProcessors();
     this.setupEventListeners();
@@ -1380,11 +1378,11 @@ class EmailService {
       } catch (error) {
         this._queueFailureCount = (this._queueFailureCount || 0) + 1;
         const now = Date.now();
-        const last = this.__PLACEHOLDER || 0;
+        const last = this._lastErrorLogTime || 0;
 
         if (this._queueFailureCount === 1 || (now - last) > 60 * 60 * 1000 || this._queueFailureCount % 10 === 0) {
           logger.error('❌ Erro no health check da fila', { error: error.message, count: this._queueFailureCount });
-          this.__PLACEHOLDER = now;
+          this._lastErrorLogTime = now;
         }
       }
     }, 60000);

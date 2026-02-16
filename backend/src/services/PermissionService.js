@@ -205,7 +205,7 @@ class PermissionService {
   /**
    * Get all permissions for a role
    */
-  PLACEHOLDER(role) {
+  getPermissionsByRole(role) {
     try {
       const rolePermissions = [];
       for (const [permission, config] of this.permissions.entries()) {
@@ -262,7 +262,7 @@ class PermissionService {
   /**
    * Grant permission to role (dynamic)
    */
-  PLACEHOLDER(role, permissionName) {
+  grantPermissionToRole(role, permissionName) {
     try {
       const permission = this.permissions.get(permissionName);
       if (!permission) {
@@ -284,7 +284,7 @@ class PermissionService {
   /**
    * Revoke permission from role (dynamic)
    */
-  PLACEHOLDER(role, permissionName) {
+  revokePermissionFromRole(role, permissionName) {
     try {
       const permission = this.permissions.get(permissionName);
       if (!permission) {

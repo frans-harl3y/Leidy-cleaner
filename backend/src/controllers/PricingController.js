@@ -153,7 +153,7 @@ class PricingController {
    * GET /api/pricing/simulate
    * Simula múltiplas opções de preço
    */
-  async PLACEHOLDER(req, res) {
+  async simulatePricing(req, res) {
     try {
       const { serviceId, date, time, userId } = req.query;
 
@@ -174,14 +174,14 @@ class PricingController {
         return res.status(404).json({ error: 'Service not found' });
       }
 
-      const options = await PricingService.__PLACEHOLDER({
+const options = await PricingService.simulateOptions({
         basePrice: service.base_price,
         services: [{ basePrice: service.base_price, name: service.name }],
         date,
         time,
         userId,
         isNewCustomer: userId ? await this.isNewCustomer(db, userId) : false,
-        daysUntilService: this.__PLACEHOLDER(date, time)
+        daysUntilService: this.calculateDaysUntilService(date, time)  
       });
 
       return res.json({
@@ -215,7 +215,7 @@ class PricingController {
   /**
    * Calcular dias até o serviço
    */
-  PLACEHOLDER(dateStr, timeStr) {
+  calculateDaysUntilService(dateStr, timeStr) {
     try {
       // Prefer explicit YYYY-MM-DD and HH:mm -> create a local datetime
       let iso = dateStr;

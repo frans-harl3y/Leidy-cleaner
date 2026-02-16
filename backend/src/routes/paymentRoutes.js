@@ -63,17 +63,17 @@ router.get('/pix/:pixTransactionId/verify', authenticateToken, async (req, res) 
 router.post('/pix/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
     const signature = req.headers['x-pix-signature'] || req.headers['x-signature'];
-    const PixWebhookService = require('../services/PixWebhookService');
+    const WebhookService = require('../services/WebhookService');
 
     // Validar assinatura se existir
     if (signature && process.env.WEBHOOK_SECRET_PIX) {
-      const isValid = PixWebhookService.validateSignature(req.body, signature, process.env.WEBHOOK_SECRET_PIX);
+      const isValid = WebhookService.validatePixSignature(req.body, signature, process.env.WEBHOOK_SECRET_PIX);
       if (!isValid) {
         return res.status(401).json({ error: 'Assinatura inválida' });
       }
     }
 
-    const result = await PixWebhookService.processWebhook(req.body);
+    const result = await WebhookService.processWebhook(req.body);
     res.json(result);
   } catch (error) {
     console.error('Erro no webhook PIX:', error);

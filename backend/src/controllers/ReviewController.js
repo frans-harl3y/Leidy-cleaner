@@ -7,7 +7,6 @@
 const { getDb } = require('../db/sqlite'); // ✅ Usar pool centralizado
 const ValidationService = require('../services/ValidationService');
 const CacheService = require('../services/CacheService');
-const QueryCacheService = require('../services/QueryCacheService');
 const EmailQueueService = require('../services/EmailService'); // Consolidated service
 const { reviewSchemas, validateSchema } = require('../utils/joiSchemas');
 const logger = require('../utils/logger');
@@ -35,13 +34,13 @@ class ReviewController {
       const review = await db.get('SELECT * FROM reviews WHERE id = ?', reviewId);
 
       // ✅ NOVO: Invalidar cache de reviews públicos
-      QueryCacheService.invalidateAllCache();
+      CacheService.invalidateAllCache();
 
       // ✅ Enfileirar email de agradecimento (assíncrono)
       try {
         const user = await db.get('SELECT email, name, full_name FROM users WHERE id = ?', userId);
         if (user && user.email) {
-          await EmailQueueService.__PLACEHOLDER(
+          await EmailQueueService.enqueueReviewNotification(
             user.email,
             user.name || user.full_name,
             {

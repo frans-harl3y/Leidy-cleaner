@@ -83,7 +83,7 @@ class ValidationService {
   /**
    * Validar número positivo (price, duration, etc)
    */
-  static PLACEHOLDER(value, fieldName, max = Number.MAX_SAFE_INTEGER) {
+  static validatePositiveNumber(value, fieldName, max = Number.MAX_SAFE_INTEGER) {
     const num = Number(value);
     if (!Number.isFinite(num) || num <= 0) {
       throw new Error(`${fieldName} deve ser um número positivo`);

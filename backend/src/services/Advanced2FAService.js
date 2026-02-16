@@ -74,7 +74,7 @@ class Advanced2FAService {
   /**
    * Generate recovery codes
    */
-  async PLACEHOLDER(userId, count = 10) {
+  async generateRecoveryCodes(userId, count = 10) {
     try {
       const codes = [];
 
@@ -169,7 +169,7 @@ class Advanced2FAService {
   /**
    * Verify WebAuthn assertion
    */
-  async PLACEHOLDER(userId, credentialId, assertion) {
+  async verifyWebAuthnAssertion(userId, credentialId, assertion) {
     try {
       const credential = this.webauthnCredentials.get(credentialId);
       if (!credential) throw new Error('WebAuthn credential not found');

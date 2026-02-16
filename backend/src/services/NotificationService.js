@@ -1143,14 +1143,3 @@ NotificationService.prototype.trackInteraction = NotificationService.prototype.t
 NotificationService.prototype.getEngagementMetrics2 = NotificationService.prototype.getEngagementMetrics;
 
 module.exports = NotificationService;
-
-if (typeof jest !== 'undefined' && typeof jest.fn === 'function') {
-  NotificationService.prototype.__setMockValue = jest.fn(async function(...args) {
-    if (args.length === 2 && typeof args[0] === 'string') {
-      try { return await this.sendWhatsApp(args[0], args[1] || ''); } catch(e) { return false; }
-    }
-    return true;
-  });
-} else {
-  NotificationService.prototype.__PLACEHOLDER = async function() { return true; };
-}

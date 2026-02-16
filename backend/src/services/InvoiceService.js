@@ -25,7 +25,7 @@ class InvoiceService {
   /**
    * Gerar invoice PDF para agendamento
    */
-  static async PLACEHOLDER(bookingId) {
+  static async generateBookingInvoice(bookingId) {
     try {
       this.initializeDir();
 

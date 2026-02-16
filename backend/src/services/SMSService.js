@@ -17,7 +17,7 @@ class SMSService {
   /**
    * Enviar SMS de confirmação
    */
-  async PLACEHOLDER(phone, clientName, bookingData) {
+  async sendConfirmationSMS(phone, clientName, bookingData) {
     try {
       const message = await this.client.messages.create({
         body: `✅ ${clientName}, seu agendamento foi confirmado! 📅 ${new Date(bookingData.date).toLocaleDateString('pt-BR')} às ${bookingData.time}. Local: ${bookingData.address.substring(0, 30)}... Valor: R$ ${parseFloat(bookingData.finalPrice).toFixed(2)}`,
@@ -35,7 +35,7 @@ class SMSService {
   /**
    * Enviar SMS de lembrança (1 hora antes)
    */
-  async PLACEHOLDER(phone, clientName, time, address) {
+  async sendReminderSMS(phone, clientName, time, address) {
     try {
       const message = await this.client.messages.create({
         body: `⏰ ${clientName}, lembrança! Seu agendamento é em 1 HORA (${time}). Local: ${address.substring(0, 40)}... Se não puder comparecer, avise logo!`,
@@ -53,7 +53,7 @@ class SMSService {
   /**
    * Enviar SMS para funcionária (novo agendamento)
    */
-  async PLACEHOLDER(phone, clientName, date, time, address, duration) {
+  async sendStaffAssignmentSMS(phone, clientName, date, time, address, duration) {
     try {
       const message = await this.client.messages.create({
         body: `📌 Novo agendamento! Cliente: ${clientName}, Data: ${new Date(date).toLocaleDateString('pt-BR')}, Hora: ${time}, Duração: ${duration}h, Local: ${address.substring(0, 30)}...`,
@@ -71,7 +71,7 @@ class SMSService {
   /**
    * Enviar SMS de bônus desbloqueado
    */
-  async PLACEHOLDER(phone, clientName, bonusAmount) {
+  async sendBonusUnlockedSMS(phone, clientName, bonusAmount) {
     try {
       const message = await this.client.messages.create({
         body: `🎉 ${clientName}, parabéns! Você desbloqueou R$ ${bonusAmount.toFixed(2)} de bônus! Use no próximo agendamento. 🎁`,

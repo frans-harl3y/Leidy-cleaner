@@ -247,7 +247,7 @@ class SearchService {
   /**
    ✅ NOVO: Autocomplete suggestions
    */
-  async PLACEHOLDER(query) {
+  async getAutocompleteSuggestions(query) {
     const suggestions = [
       'Limpeza Residencial',
       'Limpeza Comercial',

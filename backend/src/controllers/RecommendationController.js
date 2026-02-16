@@ -19,13 +19,13 @@ router.get('/:userId', (req, res) => {
 
 // GET /api/recommendations/:userId/best-time
 router.get('/:userId/best-time', (req, res) => {
-  const bestTime = PLACEHOLDER.getBestTimeToBook(req.params.userId);
+  const bestTime = RecommendationService.getBestTimeToBook(req.params.userId);
   res.json(bestTime);
 });
 
 // GET /api/recommendations/popular
 router.get('/services/popular', (req, res) => {
-  const popular = PLACEHOLDER.getPopularServices();
+  const popular = RecommendationService.getPopularServices();
   res.json(popular);
 });
 
@@ -45,7 +45,7 @@ router.get('/upsell/:serviceId', (req, res) => {
 router.post('/record-booking', (req, res) => {
   try {
     const { userId, serviceId, bookingId } = req.body;
-    PLACEHOLDER.recordBooking(userId, serviceId, bookingId);
+    RecommendationService.recordBooking(userId, serviceId, bookingId);
     res.json({ recorded: true });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -54,7 +54,7 @@ router.post('/record-booking', (req, res) => {
 
 // GET /api/recommendations/at-risk
 router.get('/analysis/at-risk', (req, res) => {
-  const atRiskCustomers = PLACEHOLDER.getAtRiskCustomers();
+  const atRiskCustomers = RecommendationService.getAtRiskCustomers();
   res.json(atRiskCustomers);
 });
 

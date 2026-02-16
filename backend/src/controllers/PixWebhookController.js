@@ -4,7 +4,7 @@
  */
 
 const logger = require('../utils/logger');
-const PixWebhookService = require('../services/PixWebhookService');
+const WebhookService = require('../services/WebhookService');
 const PixService = require('../services/PixService');
 
 class PixWebhookController_Auto_73 {
@@ -44,7 +44,7 @@ class PixWebhookController_Auto_73 {
       }
 
       // Processar webhook com verificação de assinatura
-      const result = await PixWebhookService.processPixWebhook(
+      const result = await WebhookService.processPixWebhook(
         body,
         bankSignature,
         bankTimestamp
@@ -83,7 +83,7 @@ class PixWebhookController_Auto_73 {
     try {
       const { pixTransactionId } = req.params;
 
-      const result = await PixWebhookService.PixWebhookController_Auto_73(pixTransactionId);
+      const result = await WebhookService.pollPixStatus(pixTransactionId);
 
       if (!result.success) {
         return res.status(404).json(result);
@@ -150,7 +150,7 @@ class PixWebhookController_Auto_73 {
     try {
       const minutesUntilExpiry = req.query.minutes || 5;
 
-      const result = await PixWebhookService.PixWebhookController_Auto_73(
+      const result = await WebhookService.listExpiringPix(
         parseInt(minutesUntilExpiry)
       );
 
@@ -175,7 +175,7 @@ class PixWebhookController_Auto_73 {
    */
   static async cleanupExpiredPixs(req, res) {
     try {
-      const result = await PixWebhookService.PixWebhookController_Auto_73();
+      const result = await WebhookService.cleanExpiredPix();
 
       if (!result.success) {
         return res.status(500).json(result);

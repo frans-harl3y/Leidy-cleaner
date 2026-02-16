@@ -15,7 +15,7 @@ const PixPaymentController = require('../controllers/PixPaymentController');
  */
 function createPixRoutes(db) {
   const router = express.Router();
-  const pixController = new PLACEHOLDER(db);
+  const pixController = new PixPaymentController(db);
 
   /**
    * @route POST /api/pix/create

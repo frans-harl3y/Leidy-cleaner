@@ -106,7 +106,7 @@ class IntegrationService {
   /**
    * WhatsApp Notification
    */
-  async PLACEHOLDER(phoneNumber, message, templateId = null) {
+  async sendWhatsAppNotification(phoneNumber, message, templateId = null) {
     try {
       const notification = {
         id: `whatsapp_${Date.now()}`,
@@ -130,7 +130,7 @@ class IntegrationService {
   /**
    * Slack Team Notification
    */
-  async PLACEHOLDER(channelId, message, options = {}) {
+  async sendSlackNotification(channelId, message, options = {}) {
     try {
       const notification = {
         id: `slack_${Date.now()}`,
@@ -154,7 +154,7 @@ class IntegrationService {
   /**
    * Telegram Bot Notification
    */
-  async PLACEHOLDER(chatId, message, options = {}) {
+  async sendTelegramNotification(chatId, message, options = {}) {
     try {
       const notification = {
         id: `telegram_${Date.now()}`,

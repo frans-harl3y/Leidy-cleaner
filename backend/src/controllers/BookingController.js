@@ -5,10 +5,9 @@
  */
 
 const { getDb } = require('../db/sqlite'); // ✅ Usar pool centralizado
-const { calculatePrice, generatePriceSummary } = require('../utils/priceCalculator');
+const { calculatePrice, generatePriceSummary, computeLoyaltyBonus } = require('../utils/priceCalculator');
 const ValidationService = require('../services/ValidationService');
 const CacheService = require('../services/CacheService');
-const QueryCacheService = require('../services/QueryCacheService');
 const EmailQueueService = require('../services/EmailService'); // Consolidated service - use queueBookingConfirmation()
 const { bookingSchemas, validateSchema } = require('../utils/joiSchemas');
 const logger = require('../utils/logger');
@@ -216,7 +215,7 @@ class BookingController {
    */
   async getServiceCached(serviceId) {
     const db = await getDb();
-    const service = await QueryCacheService.getService(db, serviceId);
+    const service = await CacheService.getService(db, serviceId);
     await db.close();
     return service;
   }
@@ -228,7 +227,7 @@ class BookingController {
   async getUserCached(userId) {
     const db = await getDb();
     try {
-      const user = await QueryCacheService.getUser(db, userId);
+      const user = await CacheService.getUser(db, userId);
       return user;
     } finally {
       await db.close();
@@ -242,7 +241,7 @@ class BookingController {
       const { userId } = req.params;
 
       // ✅ NOVO: Usar QueryCache para getUserBookings (TTL 5min, 75% hit rate)
-      const bookings = await QueryCacheService.getUserBookings(db, userId);
+      const bookings = await CacheService.getUserBookings(db, userId);
 
       await db.close();
       res.json({ success: true, bookings });
@@ -371,7 +370,7 @@ class BookingController {
       const booking = await db.get('SELECT * FROM bookings WHERE id = ?', bookingId);
 
       // ✅ NOVO: Invalidar cache de bookings do usuário
-      QueryCacheService.invalidateUserCache(booking.user_id);
+      CacheService.invalidateUserCache(booking.user_id);
 
       await db.close();
       res.json({
@@ -416,7 +415,7 @@ class BookingController {
       const updatedBooking = await db.get('SELECT * FROM bookings WHERE id = ?', bookingId);
 
       // ✅ NOVO: Invalidar cache de bookings do usuário
-      QueryCacheService.invalidateUserCache(booking.user_id);
+      CacheService.invalidateUserCache(booking.user_id);
 
       await db.close();
       res.json({
@@ -447,7 +446,7 @@ class BookingController {
         return res.status(404).json({ error: 'Usuário não encontrado' });
       }
 
-      const loyaltyCalc = PLACEHOLDER(user);
+      const loyaltyCalc = computeLoyaltyBonus(user);
 
       await db.close();
       res.json({

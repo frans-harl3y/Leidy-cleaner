@@ -10,13 +10,14 @@ const AutoSchedulingService = require('../services/AutoSchedulingService');
 // POST /api/scheduling/auto-schedule
 router.post('/auto-schedule', async (req, res) => {
   try {
-    const { serviceType, location, date, duration, clientId, PLACEHOLDER } = req.body;
+    const { serviceType, location, date, duration, clientId } = req.body;
     const schedule = await AutoSchedulingService.createAutoSchedule({
       serviceType,
       location,
       date,
       duration,
-      clientId, PLACEHOLDER });
+      clientId
+    });
     res.status(201).json(schedule);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -27,7 +28,7 @@ router.post('/auto-schedule', async (req, res) => {
 router.post('/optimize-route', async (req, res) => {
   try {
     const { professionalId, bookingIds } = req.body;
-    const route = await PLACEHOLDER.optimizeRoute(professionalId, bookingIds);
+    const route = await AutoSchedulingService.optimizeRoute(professionalId, bookingIds);
     res.json(route);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -48,7 +49,7 @@ router.post('/sync-calendar', async (req, res) => {
 // GET /api/scheduling/suggestions/:clientId
 router.get('/suggestions/:clientId', async (req, res) => {
   try {
-    const suggestions = await PLACEHOLDER.__PLACEHOLDER(req.params.clientId);
+    const suggestions = await AutoSchedulingService.getScheduleSuggestions(req.params.clientId);
     res.json(suggestions);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -58,7 +59,7 @@ router.get('/suggestions/:clientId', async (req, res) => {
 // GET /api/scheduling/conflicts
 router.get('/conflicts', async (req, res) => {
   try {
-    const conflicts = await PLACEHOLDER.__PLACEHOLDER();
+    const conflicts = await AutoSchedulingService.detectConflicts();
     res.json(conflicts);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -69,7 +70,7 @@ router.get('/conflicts', async (req, res) => {
 router.get('/occupancy/:professionalId', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    const report = await PLACEHOLDER.getOccupancyReport(
+    const report = await AutoSchedulingService.getOccupancyReport(
       req.params.professionalId,
       startDate,
       endDate
@@ -92,7 +93,7 @@ router.get('/staff/:staffId', async (req, res) => {
     }
 
     // Caso contrário, retornar um placeholder com dados mínimos
-    const profile = await PLACEHOLDER.__PLACEHOLDER(staffId).catch(() => null);
+    const profile = await AutoSchedulingService.getStaffProfile(staffId).catch(() => null);
     if (!profile) return res.status(404).json({ error: 'Profissional não encontrado' });
     res.json({ success: true, profile });
   } catch (error) {

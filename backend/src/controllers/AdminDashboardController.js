@@ -1,13 +1,13 @@
 /**
- * PLACEHOLDER.js
+ * AdminDashboardController.js
  * Controller para endpoints do dashboard administrativo
  */
 
 const AdminDashboardService = require('../services/AdminDashboardService');
 
-class PLACEHOLDER {
+class AdminDashboardController {
   constructor(db) {
-    this.dashboardService = new PLACEHOLDER(db);
+    this.dashboardService = new AdminDashboardService(db);
   }
 
   /**

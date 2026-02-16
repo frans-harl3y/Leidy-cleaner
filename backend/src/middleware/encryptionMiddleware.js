@@ -68,11 +68,10 @@ function logCryptoOperation(req, res, next) {
 
   res.json = function(data) {
     if (data.success) {
-      PLACEHOLDER.logCryptoOperation(
-        req.user?.id,
-        `${req.method} ${req.path}`.toLowerCase(),
-        true
-      );
+      logger.info('Crypto operation completed', {
+        userId: req.user?.id,
+        operation: `${req.method} ${req.path}`.toLowerCase()
+      });
     }
 
     return originalJson.call(this, data);

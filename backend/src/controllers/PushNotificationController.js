@@ -85,7 +85,7 @@ router.put('/preferences/:userId', async (req, res) => {
 // DELETE /api/notifications/unsubscribe/:subscriptionId
 router.delete('/unsubscribe/:subscriptionId', async (req, res) => {
   try {
-    const result = await PLACEHOLDER.unsubscribeDevice(req.params.subscriptionId);
+    const result = await NotificationService.unsubscribeDevice(req.params.subscriptionId);
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -95,7 +95,7 @@ router.delete('/unsubscribe/:subscriptionId', async (req, res) => {
 // GET /api/notifications/stats
 router.get('/stats', async (req, res) => {
   try {
-    const stats = await PLACEHOLDER.getDeliveryStats();
+    const stats = await NotificationService.getDeliveryStats();
     res.json(stats);
   } catch (error) {
     res.status(400).json({ error: error.message });

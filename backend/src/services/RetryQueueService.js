@@ -96,7 +96,7 @@ class RetryQueue {
    * Processar uma tentativa individual
    */
   async processRetry(retry) {
-    const { retry_id, operation_id, operation_type, payload, retry_count } = retry;
+    const { retry_id, operation_type, payload, retry_count } = retry;
 
     try {
       const parsedPayload = JSON.parse(payload);
@@ -169,12 +169,12 @@ class RetryQueue {
    */
   async retryProcessWebhook(payload) {
     try {
-      const PixWebhookService = require('./PixWebhookService');
+      const WebhookService = require('./WebhookService');
       // payload pode conter { body, signature } ou já o objeto
       const body = payload.body || payload;
       const signature = payload.signature || payload.sign || null;
 
-      const result = await PixWebhookService.processWebhook(body, signature);
+      const result = await WebhookService.processWebhook(body, signature);
       return result;
     } catch (err) {
       console.error('❌ retryProcessWebhook failed:', err.message);

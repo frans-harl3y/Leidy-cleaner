@@ -14,7 +14,7 @@ router.get('/nearby', authenticateToken, async (req, res) => {
     }
 
     const radius = radiusKm ? parseFloat(radiusKm) : 5;
-    const professionals = await GeoLocationService.__PLACEHOLDER(
+    const professionals = await GeoLocationService.findNearbyProfessionals(
       parseFloat(latitude), 
       parseFloat(longitude), 
       radius

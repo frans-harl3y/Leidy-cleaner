@@ -4,7 +4,7 @@
  */
 
 const router = require('express').Router();
-const HourPricingService = require('../services/HourPricingService');
+const PricingService = require('../services/PricingService');
 const { authenticateToken } = require('../middleware/auth');
 
 /**
@@ -50,7 +50,7 @@ router.post('/calculate-hours', (req, res) => {
       });
     }
 
-    const result = HourPricingService.calculatePrice(parseFloat(hours), extras);
+    const result = PricingService.calculateHourPrice(parseFloat(hours), extras);
 
     res.json({
       success: true,
@@ -81,7 +81,7 @@ router.post('/calculate-multiple', (req, res) => {
       });
     }
 
-    const result = HourPricingService.calculateMultipleBookings(bookings);
+    const result = PricingService.calculateMultipleBookings(bookings);
 
     res.json({
       success: true,
@@ -102,7 +102,7 @@ router.post('/calculate-multiple', (req, res) => {
  */
 router.get('/hour-extras', (req, res) => {
   try {
-    const extras = HourPricingService.getAvailableExtras();
+    const extras = PricingService.getAvailableExtras();
     res.json({
       success: true,
       data: extras
@@ -226,8 +226,8 @@ router.post('/booking-estimate', authenticateToken, async (req, res) => {
     const { durationHours = 1, useHourCredit = false } = req.body;
     const userId = req.user?.id;
 
-    const HourPricingService = require('../services/HourPricingService');
-    const result = await HourPricingService.estimateBookingPrice({
+    const PricingService = require('../services/PricingService');
+    const result = await PricingService.calculateHourlyBookingPrice({
       userId: userId,
       durationHours: parseFloat(durationHours),
       useHourCredit: useHourCredit,

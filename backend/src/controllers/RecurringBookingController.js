@@ -35,25 +35,25 @@ router.get('/recurring/:userId', (req, res) => {
 // PUT /api/bookings/recurring/:bookingId/pause
 router.put('/recurring/:bookingId/pause', (req, res) => {
   const { resumeUntil } = req.body;
-  const booking = PLACEHOLDER.pauseRecurring(req.params.bookingId, resumeUntil);
+  const booking = RecurringBookingService.pauseRecurring(req.params.bookingId, resumeUntil);
   res.json(booking);
 });
 
 // PUT /api/bookings/recurring/:bookingId/resume
 router.put('/recurring/:bookingId/resume', (req, res) => {
-  const booking = PLACEHOLDER.resumeRecurring(req.params.bookingId);
+  const booking = RecurringBookingService.resumeRecurring(req.params.bookingId);
   res.json(booking);
 });
 
 // DELETE /api/bookings/recurring/:bookingId
 router.delete('/recurring/:bookingId', (req, res) => {
-  const result = PLACEHOLDER.cancelRecurring(req.params.bookingId);
+  const result = RecurringBookingService.cancelRecurring(req.params.bookingId);
   res.json(result);
 });
 
 // PUT /api/bookings/recurring/:bookingId
 router.put('/recurring/:bookingId', (req, res) => {
-  const updated = PLACEHOLDER.updateRecurring(req.params.bookingId, req.body);
+  const updated = RecurringBookingService.updateRecurring(req.params.bookingId, req.body);
   res.json(updated);
 });
 

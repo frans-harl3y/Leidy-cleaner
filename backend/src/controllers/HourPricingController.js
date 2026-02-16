@@ -3,7 +3,7 @@
  * Rotas para cálculo de preças por hora
  */
 
-const HourPricingService = require('../services/HourPricingService');
+const PricingService = require('../services/PricingService');
 const logger = require('../utils/logger');
 
 class HourPricingController {
@@ -22,7 +22,7 @@ class HourPricingController {
         });
       }
 
-      const result = HourPricingService.calculatePrice(hours, extras);
+      const result = PricingService.calculateHourPrice(hours, extras);
 
       return res.json({
         success: true,
@@ -52,7 +52,7 @@ class HourPricingController {
         });
       }
 
-      const result = HourPricingService.calculateMultipleBookings(bookings);
+      const result = PricingService.calculateMultipleBookings(bookings);
 
       return res.json({
         success: true,
@@ -73,7 +73,7 @@ class HourPricingController {
    */
   async getExtras(req, res) {
     try {
-      const extras = HourPricingService.getAvailableExtras();
+      const extras = PricingService.getAvailableExtras();
       return res.json({
         success: true,
         data: extras

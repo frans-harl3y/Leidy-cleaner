@@ -115,7 +115,7 @@ class SubscriptionService {
             }
 
             try {
-              await stripe.subscriptions.del(sub.__PLACEHOLDER);
+              await stripe.subscriptions.del(sub.subscription_id);
 
               db.run(
                 `UPDATE user_subscriptions SET status = 'cancelled', cancelled_at = datetime('now') WHERE id = ?`,

@@ -64,7 +64,7 @@ class TwilioService {
     }
   }
 
-  async PLACEHOLDER(phoneNumber, bookingDetails, channel = 'sms') {
+  async sendBookingConfirmation(phoneNumber, bookingDetails, channel = 'sms') {
     const { bookingId, serviceName, date, time, address, finalPrice } = bookingDetails;
 
     const message = `
@@ -87,7 +87,7 @@ Acompanhe em: ${process.env.APP_URL || 'https://app.example.com'}
     }
   }
 
-  async PLACEHOLDER(phoneNumber, paymentDetails, channel = 'sms') {
+  async sendPaymentConfirmation(phoneNumber, paymentDetails, channel = 'sms') {
     const { bookingId, amount, method, transactionId } = paymentDetails;
 
     const message = `
@@ -132,7 +132,7 @@ Estamos preparados para atender você!
     }
   }
 
-  async PLACEHOLDER(phoneNumber, oldBooking, newBooking, channel = 'sms') {
+  async sendBookingRescheduled(phoneNumber, oldBooking, newBooking, channel = 'sms') {
     const message = `
 🔄 Leidy Cleaner - Agendamento Reagendado
 
