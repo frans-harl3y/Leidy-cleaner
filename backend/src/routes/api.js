@@ -780,4 +780,13 @@ router.use('/recurring-bookings', authenticateToken, (req, res) => AutoPlacehold
 // const referralRoutes = require('./referralRoutes');
 // // router.use('/referrals', authenticateToken, referralRoutes);
 
+// ===== SMART FEATURES (5 Advanced Features) =====
+// Feature #1: Smart Availability Widget
+// Feature #2: Dynamic Pricing Engine
+// Feature #3: Intelligent Cross-Selling
+// Feature #4: Advanced Analytics Dashboard
+// Feature #5: Intelligent Staff Optimization
+const smartFeaturesRoutes = require('./smartFeaturesRoutes');
+router.use('/smart', smartFeaturesRoutes);
+
 module.exports = router;
