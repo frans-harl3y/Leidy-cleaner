@@ -6,7 +6,7 @@ Backend API instalada e rodando em `http://localhost:3001`.
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 # Acesse http://localhost:3000
 ```
@@ -155,6 +155,33 @@ export const useAuth = () => {
   return context;
 };
 ```
+
+## Rodando testes
+
+```bash
+# instalar dependências (primeira vez)
+cd frontend
+npm ci
+
+# rodar testes unitários (Jest)
+npm test
+
+# rodar e2e (Playwright)
+npx playwright test
+```
+
+## Variáveis de ambiente úteis
+
+- `NEXT_PUBLIC_API_URL` — URL pública do backend (ex: `http://localhost:3001/api/v1`)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — chave pública Stripe (sandbox)
+- `NODE_ENV` — `development` | `production`
+
+## Deploy rápido
+
+1. Build: `npm run build`
+2. Start: `npm start`
+
+Para deploy no Vercel/Netlify, aponte o `NEXT_PUBLIC_API_URL` para a API em produção e configure secrets (Stripe, DB) no painel.
 
 ## Componentes Tailwind
 
