@@ -479,9 +479,18 @@ class ApiClient {
     }
   }
 
-  async createCheckoutSession(bookingId: string): Promise<{ url: string }> {
+  async createPixPayment(bookingId: string): Promise<{ qrCode: string; pixKey: string; amount: number }> {
     try {
-      const response = await this.client.post('/payments/checkout', { bookingId });
+      const response = await this.client.post('/payments/pix', { bookingId });
+      return response.data.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  async confirmPixPayment(bookingId: string): Promise<{ success: boolean; booking: Booking }> {
+    try {
+      const response = await this.client.post('/payments/pix/confirm', { bookingId });
       return response.data.data;
     } catch (error) {
       throw this.handleError(error);

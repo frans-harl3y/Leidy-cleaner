@@ -4,41 +4,105 @@
 
 Plataforma SaaS para agendamento de serviços de limpeza residencial e comercial.
 
+## 🆕 Melhorias Recentes
+
+### Segurança & Performance
+- ✅ **Helmet.js Avançado**: Configuração completa de headers de segurança com CSP
+- ✅ **CORS Restritivo**: Controle granular de origens permitidas
+- ✅ **Rate Limiting Diferenciado**: Limites específicos por endpoint (auth, API, geral)
+- ✅ **Sanitização de Entrada**: Middleware para prevenir XSS e injeção de código
+- ✅ **Cache em Memória**: Cache de 5min para endpoints de serviços
+- ✅ **Health Checks Avançados**: Verificação de DB, memória e sistema
+
+### Monitoramento & Observabilidade
+- ✅ **Error Handler Aprimorado**: Logs detalhados com contexto completo
+- ✅ **Health Checks**: Endpoint `/health` com métricas de sistema
+- ✅ **Logging Estruturado**: Winston com rotação de logs
+
+### Backup & Recuperação
+- ✅ **Scripts de Backup**: Automação completa (DB + uploads + config)
+- ✅ **Scripts de Restore**: Recuperação com verificação de integridade
+- ✅ **Limpeza Automática**: Rotação de backups antigos
+
+### DevOps & Qualidade
+- ✅ **Docker Compose**: Setup completo com Nginx reverse proxy
+- ✅ **Scripts de Validação**: Verificação de pré-requisitos
+- ✅ **Troubleshooting Guide**: Guia completo de resolução de problemas
+- ✅ **Plano de Melhorias**: Roadmap detalhado de próximas implementações
+
 ## 🚀 Início Rápido
 
-### Via Script (Recomendado)
+### ⭐ Opção 1: Single Port (Mais Simples - Recomendado)
+
+Roda tudo em uma só porta - frontend + backend integrado:
+
+```bash
+# Setup (se necessário)
+npm run setup:local
+
+# Iniciar tudo em uma porta
+npm run dev:single-port
+
+# Acessar: http://localhost:3000
+# API disponível automaticamente em /api/*
+```
+
+**Vantagens:**
+- ✅ **UMA SÓ PORTA** (3000)
+- ✅ Funciona em qualquer máquina
+- ✅ Sem Docker necessário
+- ✅ Setup automático
+- ✅ SQLite incluído
+
+### Opção 2: Local sem Docker (Desenvolvimento Separado)
+
+```bash
+# Setup completo (SQLite, sem Docker)
+npm run setup:local
+
+# Iniciar desenvolvimento
+npm run dev:local
+
+# Acessar:
+# - Frontend: http://localhost:3000
+# - Backend: http://localhost:3001
+# - Health: http://localhost:3001/health
+```
+
+### Opção 3: Via Docker (Produção)
+
+```bash
+# Inicia tudo: nginx (porta 80) + frontend + backend + postgres
+docker-compose -f docker-compose.dev.yml up -d
+
+# Acessar:
+# - App: http://localhost
+# - API: http://localhost/api/v1
+# - Backend direto: http://localhost:3001 (se precisar)
+```
+
+### Opção 3: Via Script Local (Com Docker Postgres)
 
 ```bash
 ./setup-local.sh
 ```
-
-Este script irá:
-1. Verificar pré-requisitos (Docker, Node.js)
-2. Iniciar PostgreSQL em container
-3. Instalar dependências (backend + frontend)
-4. Rodar migrations e seed
 
 ### Manual
 
 **Terminal 1 - Backend:**
 ```bash
 cd backend
+cp .env.example .env  # Configurar variáveis
 npm install
-npm run migrate  # Se novo
-npm run dev      # Roda em :3001
+npm run migrate
+npm run dev
 ```
 
 **Terminal 2 - Frontend:**
 ```bash
 cd frontend
 npm install
-npm run dev      # Roda em :3000
-```
-
-**Terminal 3 - Testes:**
-```bash
-cd backend
-npm test
+npm run dev
 ```
 
 ## 📊 Status do Projeto

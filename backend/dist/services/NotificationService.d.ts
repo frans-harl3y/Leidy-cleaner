@@ -1,4 +1,5 @@
 export declare class NotificationService {
+    private static getTransporter;
     static sendEmail(to: string, subject: string, text: string): Promise<void>;
     static sendSMS(to: string, text: string): Promise<void>;
     /**

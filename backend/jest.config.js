@@ -1,9 +1,11 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   globalSetup: '<rootDir>/jest.globalSetup.js',
   setupFiles: ['<rootDir>/jest.env.js'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
   moduleNameMapper: {
     '^newrelic$': '<rootDir>/__mocks__/newrelic.js'
   },
@@ -25,5 +27,5 @@ module.exports = {
   testRegex: '(/__tests__/|\\.(test|spec))\\.(js|ts)$',
   testPathIgnorePatterns: ['/node_modules/', '/dist/', '/e2e/', '/coverage/'],
   verbose: true,
-  maxWorkers: '50%',
+  maxWorkers: 1, // Execute tests sequentially to avoid database conflicts
 };

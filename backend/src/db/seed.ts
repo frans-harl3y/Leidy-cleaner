@@ -6,32 +6,63 @@ async function seedDatabase() {
   try {
     logger.info('🌱 Starting database seeding...');
 
-    // Check admin
-    const existingAdmin = await query(
-      "SELECT COUNT(*) as count FROM users WHERE role = 'admin'"
-    );
-    const adminCount = parseInt(((existingAdmin as any[])[0] as any).count || '0', 10);
-    if (adminCount === 0) {
-      const adminPassword = await hashPassword(process.env.ADMIN_PASSWORD || 'admin123456');
-      await query(
-        `INSERT INTO users (email, password_hash, full_name, phone, role, is_active)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          'admin@vammos.com',
-          adminPassword,
-          'Administrador',
-          '+55 11 98765-4321',
-          'admin',
-          true
-        ]
+    // For tests, use direct database connection to avoid module conflicts
+    let testQuery = query;
+    if (process.env.NODE_ENV === 'test') {
+      const { Pool } = require('pg');
+      const testPool = new Pool({
+        host: 'localhost',
+        port: 5432,
+        database: 'postgres',
+        user: 'postgres',
+        password: 'postgres',
+      });
+
+      // Use direct pool query for tests
+      testQuery = async (sql: string, params?: any[]) => {
+        const client = await testPool.connect();
+        try {
+          const result = await client.query(sql, params);
+          return result.rows;
+        } finally {
+          client.release();
+        }
+      };
+
+      // Clean up test pool after seeding
+      process.on('exit', () => testPool.end());
+    }
+
+    // Check admin (skip if SKIP_ADMIN_SEED is set)
+    if (!process.env.SKIP_ADMIN_SEED) {
+      const existingAdmin = await testQuery(
+        "SELECT COUNT(*) as count FROM users WHERE role = 'admin'"
       );
-      logger.info('✨ Admin user created: admin@vammos.com');
+      const adminCount = parseInt(((existingAdmin as any[])[0] as any).count || '0', 10);
+      if (adminCount === 0) {
+        const adminPassword = await hashPassword(process.env.ADMIN_PASSWORD || 'admin123456');
+        await testQuery(
+          `INSERT INTO users (email, password_hash, full_name, phone, role, is_active)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            'admin@vammos.com',
+            adminPassword,
+            'Administrador',
+            '+55 11 98765-4321',
+            'admin',
+            true
+          ]
+        );
+        logger.info('✨ Admin user created: admin@vammos.com');
+      } else {
+        logger.info('✅ Admin user already exists');
+      }
     } else {
-      logger.info('✅ Admin user already exists');
+      logger.info('⏭️ Skipping admin seed (SKIP_ADMIN_SEED=true)');
     }
 
     // Services
-    const existingServices = await query('SELECT COUNT(*) as count FROM services');
+    const existingServices = await testQuery('SELECT COUNT(*) as count FROM services');
     const servicesCount = parseInt((existingServices[0] as any).count || '0', 10);
     if (servicesCount === 0) {
       const services = [
@@ -41,7 +72,7 @@ async function seedDatabase() {
       ];
 
       for (const service of services) {
-        await query(
+        await testQuery(
           `INSERT INTO services (name, description, category, base_price, duration_minutes, is_active)
            VALUES ($1, $2, $3, $4, $5, $6)`,
           [service.name, service.description, service.category, service.base_price, service.duration_minutes, true]
@@ -53,10 +84,10 @@ async function seedDatabase() {
     }
 
     // Company
-    const existingCompany = await query('SELECT COUNT(*) as count FROM company_info');
+    const existingCompany = await testQuery('SELECT COUNT(*) as count FROM company_info');
     const companyCount = parseInt((existingCompany[0] as any).count || '0', 10);
     if (companyCount === 0) {
-      await query(
+      await testQuery(
         `INSERT INTO company_info (name, legal_name, email, phone, address, city, state, country, postal_code, logo_url, description, terms, created_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NOW(),NOW())`,
         [
@@ -80,10 +111,18 @@ async function seedDatabase() {
     }
 
     logger.info('✅ Database seeding completed successfully!');
-    process.exit(0);
+    // Only exit if called directly, not when imported
+    if (require.main === module) {
+      process.exit(0);
+    }
   } catch (err) {
     logger.error('❌ Seeding failed:', err);
-    process.exit(1);
+    // Only exit if called directly, not when imported
+    if (require.main === module) {
+      process.exit(1);
+    } else {
+      throw err; // Re-throw for Jest to catch
+    }
   }
 }
 

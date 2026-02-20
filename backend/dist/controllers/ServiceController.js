@@ -5,6 +5,7 @@ exports.ServiceController = void 0;
 const errorHandler_1 = require("../middleware/errorHandler");
 const ServiceService_1 = require("../services/ServiceService");
 const schemas_1 = require("../utils/schemas");
+const cache_1 = require("../utils/cache");
 // helper to convert snake_case keys to camelCase recursively
 function camelize(obj) {
     if (Array.isArray(obj))
@@ -23,22 +24,36 @@ exports.ServiceController = ServiceController;
 _a = ServiceController;
 ServiceController.getAll = (0, errorHandler_1.asyncHandler)(async (req, res) => {
     const { limit, offset, category, search } = req.query;
+    // Criar chave de cache baseada nos parâmetros
+    const cacheKey = `services:${limit || 10}:${offset || 0}:${category || ''}:${search || ''}`;
+    // Tentar obter do cache
+    const cachedResult = cache_1.cache.get(cacheKey);
+    if (cachedResult) {
+        return res.status(200).json({
+            message: 'Services retrieved (cached)',
+            data: cachedResult,
+            cached: true
+        });
+    }
     const result = await ServiceService_1.ServiceService.getAll({
         limit: limit ? parseInt(limit) : 10,
         offset: offset ? parseInt(offset) : 0,
         category: category,
         search: search,
     });
-    res.status(200).json({
-        message: 'Services retrieved',
-        data: {
-            services: camelize(result.services),
-            pagination: {
-                total: result.total,
-                limit: limit ? parseInt(limit) : 10,
-                offset: offset ? parseInt(offset) : 0,
-            },
+    const responseData = {
+        services: camelize(result.services),
+        pagination: {
+            total: result.total,
+            limit: limit ? parseInt(limit) : 10,
+            offset: offset ? parseInt(offset) : 0,
         },
+    };
+    // Cache por 5 minutos
+    cache_1.cache.set(cacheKey, responseData, 300000);
+    return res.status(200).json({
+        message: 'Services retrieved',
+        data: responseData,
     });
 });
 ServiceController.getById = (0, errorHandler_1.asyncHandler)(async (req, res) => {
@@ -69,6 +84,8 @@ ServiceController.create = (0, errorHandler_1.asyncHandler)(async (req, res) => 
         durationMinutes: value.durationMinutes,
         category: value.category,
     });
+    // Invalidar cache de serviços
+    cache_1.cache.clear();
     res.status(201).json({
         message: 'Service created successfully',
         data: { service: camelize(service) },

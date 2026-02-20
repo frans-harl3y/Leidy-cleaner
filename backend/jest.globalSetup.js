@@ -6,7 +6,7 @@ module.exports = async () => {
   const pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME || 'vammos_test',
+    database: process.env.DB_NAME || 'postgres', // Use postgres instead of vammos_test
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
   });

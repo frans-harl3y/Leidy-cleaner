@@ -8,13 +8,20 @@ async function runMigrations() {
     logger.info('🔄 Starting database migrations...');
 
     // Create migrations tracking table if it doesn't exist
-    await query(`
-      CREATE TABLE IF NOT EXISTS migrations (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL UNIQUE,
-        executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    const dbType = process.env.DB_TYPE || 'postgres';
+    const createMigrationsTableSQL = dbType === 'sqlite'
+      ? `CREATE TABLE IF NOT EXISTS migrations (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE,
+          executed_at DATETIME DEFAULT datetime('now')
+        )`
+      : `CREATE TABLE IF NOT EXISTS migrations (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL UNIQUE,
+          executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`;
+
+    await query(createMigrationsTableSQL);
 
     logger.info('📋 Migrations tracking table ready');
 
@@ -26,7 +33,12 @@ async function runMigrations() {
 
     // Read all migration files
     const migrationsDir = path.join(__dirname, '../../migrations');
-    const migrationFiles = fs.readdirSync(migrationsDir)
+    // Use SQLite migrations if DB_TYPE is sqlite
+    const dbType = process.env.DB_TYPE || 'postgres';
+    const actualMigrationsDir = dbType === 'sqlite'
+      ? path.join(__dirname, '../../migrations_sqlite')
+      : migrationsDir;
+    const migrationFiles = fs.readdirSync(actualMigrationsDir)
       .filter(file => file.endsWith('.sql'))
       .sort();
 
@@ -47,7 +59,7 @@ async function runMigrations() {
       }
 
       // Read and execute migration
-      const filePath = path.join(migrationsDir, file);
+      const filePath = path.join(actualMigrationsDir, file);
       const sql = fs.readFileSync(filePath, 'utf-8');
 
       logger.info(`🚀 Executing migration: ${migrationName}`);

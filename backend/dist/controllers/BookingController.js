@@ -52,7 +52,8 @@ BookingController.create = (0, errorHandler_1.asyncHandler)(async (req, res) => 
     const booking = await BookingService_1.default.createBooking(req.user.id, serviceId, bookingDate, totalPrice, address, notes, staffId);
     // fire off notifications asynchronously (don't block response)
     const NotificationService = require('../services/NotificationService').default;
-    NotificationService.notifyBookingCreated(booking).catch(() => { });
+    // some test mocks may return undefined for the mocked function; wrap with Promise.resolve
+    Promise.resolve(NotificationService.notifyBookingCreated(booking)).catch(() => { });
     res.status(201).json({ message: 'Booking created', data: { booking: camelize(booking) } });
 });
 BookingController.listByUser = (0, errorHandler_1.asyncHandler)(async (req, res) => {
@@ -69,7 +70,7 @@ BookingController.getById = (0, errorHandler_1.asyncHandler)(async (req, res) =>
     // Only owner or admin can view
     if (!req.user)
         throw (0, errorHandler_1.ApiError)('Not authenticated', 401);
-    if (req.user.role !== 'admin' && booking.user_id !== req.user.id) {
+    if (req.user.role !== 'admin' && String(booking.user_id) !== req.user.id) {
         throw (0, errorHandler_1.ApiError)('Insufficient permissions', 403);
     }
     const respBooking = camelize(booking);
@@ -95,7 +96,7 @@ BookingController.remove = (0, errorHandler_1.asyncHandler)(async (req, res) => 
     const booking = await BookingService_1.default.getById(id);
     if (!booking)
         throw (0, errorHandler_1.ApiError)('Booking not found', 404);
-    if (req.user.role !== 'admin' && booking.user_id !== req.user.id) {
+    if (req.user.role !== 'admin' && String(booking.user_id) !== req.user.id) {
         throw (0, errorHandler_1.ApiError)('Insufficient permissions', 403);
     }
     await BookingService_1.default.delete(id);

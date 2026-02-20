@@ -1,9 +1,12 @@
 "use client";
+import React from 'react';
+
 export default function RelatoriosPage() {
   const [tipo, setTipo] = React.useState('Agendamentos');
   const [inicio, setInicio] = React.useState('');
   const [fim, setFim] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+
   const handleExport = async () => {
     setLoading(true);
     try {
@@ -23,6 +26,7 @@ export default function RelatoriosPage() {
       setLoading(false);
     }
   };
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded shadow mt-8">
       <h1 className="text-3xl font-bold mb-4">Relatórios e Exportação de Dados</h1>
@@ -39,8 +43,6 @@ export default function RelatoriosPage() {
           {loading ? 'Exportando...' : 'Exportar CSV'}
         </button>
       </form>
-    </div>
-  );
     </div>
   );
 }

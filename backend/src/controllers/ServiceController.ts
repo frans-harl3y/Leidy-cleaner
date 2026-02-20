@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest, asyncHandler, ApiError } from '../middleware/errorHandler';
 import { ServiceService } from '../services/ServiceService';
 import { serviceSchema, serviceUpdateSchema } from '../utils/schemas';
+import { cache } from '../utils/cache';
 
 
 // helper to convert snake_case keys to camelCase recursively
@@ -22,6 +23,19 @@ export class ServiceController {
   static getAll = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { limit, offset, category, search } = req.query;
 
+    // Criar chave de cache baseada nos parâmetros
+    const cacheKey = `services:${limit || 10}:${offset || 0}:${category || ''}:${search || ''}`;
+
+    // Tentar obter do cache
+    const cachedResult = cache.get(cacheKey);
+    if (cachedResult) {
+      return res.status(200).json({
+        message: 'Services retrieved (cached)',
+        data: cachedResult,
+        cached: true
+      });
+    }
+
     const result = await ServiceService.getAll({
       limit: limit ? parseInt(limit as string) : 10,
       offset: offset ? parseInt(offset as string) : 0,
@@ -29,16 +43,21 @@ export class ServiceController {
       search: search as string,
     });
 
-    res.status(200).json({
-      message: 'Services retrieved',
-      data: {
-        services: camelize(result.services),
-        pagination: {
-          total: result.total,
-          limit: limit ? parseInt(limit as string) : 10,
-          offset: offset ? parseInt(offset as string) : 0,
-        },
+    const responseData = {
+      services: camelize(result.services),
+      pagination: {
+        total: result.total,
+        limit: limit ? parseInt(limit as string) : 10,
+        offset: offset ? parseInt(offset as string) : 0,
       },
+    };
+
+    // Cache por 5 minutos
+    cache.set(cacheKey, responseData, 300000);
+
+    return res.status(200).json({
+      message: 'Services retrieved',
+      data: responseData,
     });
   });
 
@@ -77,6 +96,9 @@ export class ServiceController {
       durationMinutes: value.durationMinutes,
       category: value.category,
     });
+
+    // Invalidar cache de serviços
+    cache.clear();
 
     res.status(201).json({
       message: 'Service created successfully',

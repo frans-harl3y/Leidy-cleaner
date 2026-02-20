@@ -1,14 +1,12 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import PaymentsPage from '../payments/page';
-import { redirectTo } from '@/utils/navigation';
 import { apiClient } from '@/services/api';
 import { AuthContext } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 jest.mock('@/services/api');
 jest.mock('next/navigation', () => ({ useRouter: jest.fn(), useSearchParams: jest.fn() }));
-jest.mock('@/utils/navigation', () => ({ redirectTo: jest.fn() }));
 const mockedApi = apiClient as jest.Mocked<typeof apiClient>;
 
 const pushMock = jest.fn();
@@ -27,14 +25,12 @@ function renderWithAuth(children: React.ReactNode) {
 describe('PaymentsPage', () => {
   beforeEach(() => {
     mockedApi.getBookingById.mockClear();
-    mockedApi.createCheckoutSession.mockClear();
+    mockedApi.createPixPayment.mockClear();
   });
 
-  it('redirects to checkout URL when session returned', async () => {
+  it('generates PIX QR code when payment initiated', async () => {
     mockedApi.getBookingById.mockResolvedValue({ id: 'b1', totalPrice: 100, serviceName: 'S', status: 'pending' } as any);
-    mockedApi.createCheckoutSession.mockResolvedValue({ url: 'http://checkout' });
-
-    const redirectMock = redirectTo as jest.MockedFunction<typeof redirectTo>;
+    mockedApi.createPixPayment.mockResolvedValue({ qrCode: 'base64qr', pixKey: '51980330422', amount: 100 });
 
     // render and wait for initial booking load
     await act(async () => {
@@ -43,10 +39,10 @@ describe('PaymentsPage', () => {
 
     await waitFor(() => expect(mockedApi.getBookingById).toHaveBeenCalled());
 
-    const button = await screen.findByText(/Pagar agendamento/i);
+    const button = await screen.findByText(/Gerar PIX/i);
     fireEvent.click(button);
 
-    await waitFor(() => expect(mockedApi.createCheckoutSession).toHaveBeenCalled());
-    expect(redirectMock).toHaveBeenCalledWith('http://checkout');
+    await waitFor(() => expect(mockedApi.createPixPayment).toHaveBeenCalled());
+    expect(await screen.findByText(/PIX gerado com sucesso/i)).toBeInTheDocument();
   });
 });

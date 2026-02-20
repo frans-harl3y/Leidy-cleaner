@@ -22,6 +22,8 @@ const morgan_1 = __importDefault(require("morgan"));
 const auth_1 = __importDefault(require("../../routes/auth"));
 const services_1 = __importDefault(require("../../routes/services"));
 const bookings_1 = __importDefault(require("../../routes/bookings"));
+const payments_1 = __importDefault(require("../../routes/payments"));
+const admin_1 = __importDefault(require("../../routes/admin"));
 const staff_1 = __importDefault(require("../../routes/staff"));
 const errorHandler_1 = require("../../middleware/errorHandler");
 // notifications are side effects; stub them out so tests can assert calls
@@ -39,7 +41,10 @@ app.use(express_1.default.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/v1/auth', auth_1.default);
 app.use('/api/v1/services', services_1.default);
 app.use('/api/v1/bookings', bookings_1.default);
+app.use('/api/v1/payments', payments_1.default);
 app.use('/api/v1/staff', staff_1.default);
+app.use('/api/v1/admin', admin_1.default);
+app.use('/api/v1/payments', payments_1.default);
 // Health check
 app.get('/health', (_req, res) => {
     res.json({
@@ -411,6 +416,7 @@ describe('Vammos API Integration Tests', () => {
             if (staffRes.body?.data?.tokens?.accessToken) {
                 // update role in database
                 const { query } = require('../../utils/database');
+                // Log current CHECK constraints on users table to debug failing constraint
                 await query('UPDATE users SET role = $1 WHERE email = $2', ['staff', staffEmail]);
                 // re-login to get token with staff role
                 const loginRes = await (0, supertest_1.default)(app)

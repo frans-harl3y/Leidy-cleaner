@@ -19,8 +19,6 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const toastHook = require('@/components/useToast').default;
-  const { Toast, show } = toastHook();
   return (
     <html lang="pt-BR">
       <head>
@@ -28,12 +26,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
         <script dangerouslySetInnerHTML={{ __html: `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-XXXXXXXXXX');` }} />
       </head>
-      <body>
+      <body className="bg-gray-50">
         <AuthProvider>
           <Navbar />
           <CookieBanner />
-          <main className="container mx-auto px-4 py-6">{children}</main>
-          <Toast />
+          <main className="min-h-screen">{children}</main>
         </AuthProvider>
       </body>
     </html>

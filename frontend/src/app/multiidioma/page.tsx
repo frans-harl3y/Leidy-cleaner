@@ -1,7 +1,10 @@
+"use client";
 import React from 'react';
 
+type Language = 'pt' | 'en' | 'es';
+
 export default function MultiIdiomaPage() {
-  const [lang, setLang] = React.useState('pt');
+  const [lang, setLang] = React.useState<Language>('pt');
   const textos = {
     pt: {
       titulo: 'Multi-idioma',

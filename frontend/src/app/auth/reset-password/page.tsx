@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/services/api';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -60,5 +60,13 @@ export default function ResetPasswordPage() {
       </form>
       {message && <div className="mt-4 text-blue-700">{message}</div>}
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto mt-16 p-6 text-center">Carregando...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

@@ -9,7 +9,7 @@ router.get('/', StaffController_1.StaffController.list);
 router.get('/:id', StaffController_1.StaffController.getById);
 // protected profile updates and availability
 router.put('/:id', auth_1.authenticate, StaffController_1.StaffController.updateProfile);
-router.get('/:id/availability', auth_1.authenticate, StaffController_1.StaffController.getAvailability);
+router.get('/:id/availability', StaffController_1.StaffController.getAvailability);
 router.put('/:id/availability', auth_1.authenticate, StaffController_1.StaffController.setAvailability);
 // reviews & rating (public)
 router.get('/:id/reviews', StaffController_1.StaffController.getReviews);

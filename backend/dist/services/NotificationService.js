@@ -1,21 +1,56 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationService = void 0;
 const database_1 = require("../utils/database");
+const nodemailer_1 = __importDefault(require("nodemailer"));
 class NotificationService {
+    static getTransporter() {
+        return nodemailer_1.default.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        });
+    }
     static async sendEmail(to, subject, text) {
-        // placeholder implementation: log to console or integrate with real provider
-        if (process.env.DISABLE_EMAIL === 'true') {
-            console.log('[Notification] (disabled) email', to, subject, text);
-            return;
+        try {
+            const transporter = this.getTransporter();
+            await transporter.sendMail({
+                from: process.env.SMTP_FROM || 'noreply@vammos.com',
+                to,
+                subject,
+                text,
+            });
+            console.log(`[Notification] Email sent to ${to}: ${subject}`);
         }
-        console.log('[Notification] email to', to, 'subject', subject);
-        // TODO: hook up to SendGrid/SES/etc using API key from env
+        catch (error) {
+            console.error('[Notification] Failed to send email:', error);
+            // Fallback to console log
+            console.log('[Notification] (fallback) email', to, subject, text);
+        }
     }
     static async sendSMS(to, text) {
-        // placeholder - just console log
-        console.log('[Notification] sms to', to, text);
-        // TODO: integrate with Twilio or similar
+        try {
+            const twilio = require('twilio');
+            const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+            await client.messages.create({
+                body: text,
+                from: process.env.TWILIO_PHONE_NUMBER,
+                to: to
+            });
+            console.log(`[Notification] SMS sent to ${to}`);
+        }
+        catch (error) {
+            console.error('[Notification] Failed to send SMS:', error);
+            // Fallback to console log
+            console.log('[Notification] (fallback) sms to', to, text);
+        }
     }
     /**
      * Convenience helper called whenever a new booking is created.

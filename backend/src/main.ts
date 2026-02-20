@@ -1,10 +1,13 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import { logger } from './utils/logger';
+import { sanitizeInput } from './middleware/sanitize';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import serviceRoutes from './routes/services';
@@ -15,16 +18,49 @@ import adminRoutes from './routes/admin';
 import reviewsRoutes from './routes/reviews';
 import staffRoutes from './routes/staff';
 
-dotenv.config();
-
 const app: Express = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware de segurança
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://api.stripe.com"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
+}));
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: function (origin, callback) {
+    // Permitir requests sem origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://vammos.com',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Request logging
@@ -35,27 +71,98 @@ app.use(morgan('combined', {
 }));
 
 // Rate limiting
-const limiter = rateLimit({
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100,
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
-app.use(limiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 5, // Mais restritivo para auth
+  message: 'Too many authentication attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200, // Mais permissivo para API
+  message: 'API rate limit exceeded.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Aplicar rate limiting
+app.use('/api/v1/auth', authLimiter);
+app.use('/api/v1', apiLimiter);
+app.use(generalLimiter);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Input sanitization
+app.use(sanitizeInput);
 
 // static file serving for uploads
 import path from 'path';
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Health check endpoint (público)
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({
+app.get('/health', async (_req: Request, res: Response) => {
+  const health = {
     status: 'ok',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    version: process.env.npm_package_version || '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    checks: {
+      database: false,
+      memory: true,
+      disk: true
+    }
+  };
+
+  try {
+    // Verificar conectividade com banco
+    const { query } = require('./utils/database');
+    logger.info('Testing database connection...');
+    // Small delay for SQLite initialization
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const result = await query('SELECT 1 as test');
+    logger.info('Database test result:', result);
+    health.checks.database = true;
+  } catch (error) {
+    health.status = 'error';
+    health.checks.database = false;
+    logger.error('Health check failed - Database error details:', error.message);
+    logger.error('DB_TYPE:', process.env.DB_TYPE);
+    logger.error('DATABASE_LOCAL:', process.env.DATABASE_LOCAL);
+  }
+
+  // Verificar uso de memória
+  const memUsage = process.memoryUsage();
+  const memUsageMB = {
+    rss: Math.round(memUsage.rss / 1024 / 1024),
+    heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024),
+    heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
+    external: Math.round(memUsage.external / 1024 / 1024)
+  };
+
+  // Alerta se heap usado > 80%
+  if (memUsage.heapUsed / memUsage.heapTotal > 0.8) {
+    health.checks.memory = false;
+    health.status = 'warning';
+  }
+
+  const statusCode = health.status === 'ok' ? 200 : health.status === 'warning' ? 200 : 503;
+
+  res.status(statusCode).json({
+    ...health,
+    memory: memUsageMB
   });
 });
 

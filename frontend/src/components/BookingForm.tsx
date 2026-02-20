@@ -1,9 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { CheckCircle, Calendar, MapPin, FileText, User, Loader2 } from 'lucide-react';
 import { apiClient } from '@/services/api';
 import CalendarPlaceholder from './CalendarPlaceholder';
 import { validateBooking } from '@/utils/validators';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Badge } from './ui/Badge';
+import useToast from './useToast';
 
 export default function BookingForm({
   serviceId,
@@ -18,9 +24,15 @@ export default function BookingForm({
   initialNotes?: string;
   onSuccess: (booking: any) => void;
 }) {
+  const { success, error } = useToast();
   const [date, setDate] = useState(initialDate);
   const [address, setAddress] = useState(initialAddress);
   const [notes, setNotes] = useState(initialNotes);
+  const [service, setService] = useState<any | null>(null);
+  const [staffList, setStaffList] = useState<any[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [successState, setSuccessState] = useState(false);
 
   // if parent updates initial values we should keep in sync
   useEffect(() => {
@@ -32,11 +44,6 @@ export default function BookingForm({
   useEffect(() => {
     if (initialNotes !== undefined) setNotes(initialNotes);
   }, [initialNotes]);
-  const [service, setService] = useState<any | null>(null);
-  const [staffList, setStaffList] = useState<any[]>([]);
-  const [selectedStaff, setSelectedStaff] = useState<string>('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   // id used for accessibility linking
   const dateInputId = 'booking-date';
@@ -54,10 +61,13 @@ export default function BookingForm({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setSuccessState(false);
 
     const err = validateBooking({ bookingDate: date, address, notes });
-    if (err) return setError(err);
+    if (err) {
+      error(err, 'Erro na validação');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -68,63 +78,147 @@ export default function BookingForm({
         notes,
         staffId: selectedStaff || undefined,
       });
-      onSuccess(booking);
+      setSuccessState(true);
+      success('Agendamento criado com sucesso!', 'Sucesso');
+      setTimeout(() => onSuccess(booking), 1500);
     } catch (err: any) {
-      setError(err.message || 'Erro ao criar booking');
+      error(err.message || 'Erro ao criar agendamento', 'Erro');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold mb-4">Novo Agendamento</h2>
-      {service && (
-        <div className="mb-4 p-3 border rounded bg-gray-50">
-          <p className="font-semibold">Serviço: {service.name}</p>
-          <p>Preço: R$ {service.basePrice.toFixed(2)}</p>
-        </div>
-      )}
-      {error && <div className="bg-red-100 text-red-800 p-2 mb-4">{error}</div>}
-      <form onSubmit={submit} className="space-y-3">
-        <label htmlFor={dateInputId} className="block">
-          Escolha uma data e horário
-        </label>
-        <CalendarPlaceholder id={dateInputId} value={date} onChange={setDate} />
+  if (successState) {
+    return (
+      <Card className="max-w-md mx-auto">
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <CheckCircle className="w-16 h-16 text-success mx-auto" />
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Agendamento Criado!
+              </h3>
+              <p className="text-gray-600">
+                Seu agendamento foi criado com sucesso. Redirecionando...
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-        <label htmlFor="booking-address" className="block">Endereço</label>
-        <input
-          id="booking-address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <label htmlFor="booking-notes" className="block">Notas</label>
-        <textarea
-          id="booking-notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        {staffList.length > 0 && (
-          <div>
-            <label className="block">Escolher staff (opcional)</label>
-            <select
-              className="w-full p-2 border rounded"
-              value={selectedStaff}
-              onChange={e => setSelectedStaff(e.target.value)}
-            >
-              <option value="">Nenhum</option>
-              {staffList.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name}{s.rating != null ? ` (${s.rating.toFixed(1)}⭐)` : ''}
-                </option>
-              ))}
-            </select>
+  return (
+    <Card className="max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Calendar className="w-6 h-6 text-primary" />
+          Novo Agendamento
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {service && (
+          <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-900">{service.name}</h3>
+                <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                <div className="flex items-center gap-4 mt-2">
+                  <Badge variant="secondary">{service.category}</Badge>
+                  <span className="text-sm text-gray-500 flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {service.durationMinutes} min
+                  </span>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-primary">
+                  R$ {service.basePrice}
+                </div>
+              </div>
+            </div>
           </div>
         )}
-        <button disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded">Agendar</button>
-      </form>
-    </div>
+
+        <form onSubmit={submit} className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor={dateInputId} className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Data e Horário
+            </label>
+            <CalendarPlaceholder id={dateInputId} value={date} onChange={setDate} />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="booking-address" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              Endereço
+            </label>
+            <Input
+              id="booking-address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Digite o endereço completo"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="booking-notes" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Observações (opcional)
+            </label>
+            <textarea
+              id="booking-notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+              placeholder="Instruções especiais, preferências, etc."
+            />
+          </div>
+
+          {staffList.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Profissional (opcional)
+              </label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={selectedStaff}
+                onChange={e => setSelectedStaff(e.target.value)}
+              >
+                <option value="">Escolher automaticamente</option>
+                {staffList.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}{s.rating != null ? ` (${s.rating.toFixed(1)}⭐)` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 text-base font-semibold"
+            size="lg"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Criando Agendamento...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Confirmar Agendamento
+              </>
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

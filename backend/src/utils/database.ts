@@ -3,57 +3,150 @@ import { logger } from './logger';
 
 const { Pool } = pg;
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'vammos_dev',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+// Detect database type from environment
+const getDBType = () => process.env.DB_TYPE || 'postgres';
+const getDatabaseLocal = () => process.env.DATABASE_LOCAL;
 
-pool.on('connect', () => {
-  logger.info('✅ PostgreSQL pool conectado');
-});
+logger.info('Database module loaded');
 
-pool.on('error', (error: Error) => {
-  logger.error('❌ Erro no pool PostgreSQL:', error);
-});
+// PostgreSQL configuration
+let pool: pg.Pool | null = null;
 
-export const query = async (text: string, params?: any[]) => {
-  try {
-    const result = await pool.query(text, params);
-    return result.rows;
-  } catch (error) {
-    logger.error('Database query error:', error);
-    console.error('Failed SQL:', text, 'Params:', params);
-    throw error;
+// SQLite configuration - only import when needed
+let sqlite3: any = null;
+let sqliteDb: any = null;
+
+// Initialize database connection based on type
+const initDatabase = () => {
+  const DB_TYPE = getDBType();
+  const DATABASE_LOCAL = getDatabaseLocal();
+  logger.info('🔄 initDatabase called with DB_TYPE:', DB_TYPE);
+  if (DB_TYPE === 'sqlite') {
+    logger.info('📱 Setting up SQLite database...');
+    // SQLite setup
+    if (!sqlite3) {
+      try {
+        sqlite3 = require('sqlite3');
+      } catch (err) {
+        logger.error('❌ Failed to require sqlite3:', err);
+        throw err;
+      }
+    }
+    if (!sqliteDb) {
+      sqliteDb = new sqlite3.Database(DATABASE_LOCAL || './database.sqlite', (err: Error | null) => {
+        if (err) {
+          logger.error('❌ SQLite connection error:', err);
+        } else {
+          logger.info('✅ SQLite database connected');
+        }
+      });
+    }
+    return sqliteDb;
+  } else {
+    logger.info('🐘 Setting up PostgreSQL database...');
+    // PostgreSQL setup (default)
+    if (!pool) {
+      // Use DATABASE_URL if available, otherwise construct from individual vars
+      const dbConfig = process.env.DATABASE_URL
+        ? { connectionString: process.env.DATABASE_URL }
+        : {
+            host: process.env.DB_HOST || 'localhost',
+            port: parseInt(process.env.DB_PORT || '5432'),
+            database: process.env.DB_NAME || (process.env.NODE_ENV === 'test' ? 'vammos_test' : 'vammos_dev'),
+            user: process.env.DB_USER || 'postgres',
+            password: process.env.DB_PASSWORD || 'postgres',
+          };
+
+      pool = new Pool({
+        ...dbConfig,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      });
+
+      pool.on('connect', () => {
+        logger.info('✅ PostgreSQL pool connected');
+      });
+
+      pool.on('error', (error: Error) => {
+        logger.error('❌ PostgreSQL pool error:', error);
+      });
+    }
+    return pool;
   }
 };
 
-export const getClient = async () => {
-  return await pool.connect();
+// Initialize immediately - REMOVED for lazy loading
+// initDatabase();
+
+// Universal query function
+export const query = async (text: string, params?: any[]): Promise<any[]> => {
+  // Lazy initialization
+  if ((getDBType() === 'sqlite' && !sqliteDb) || (getDBType() !== 'sqlite' && !pool)) {
+    initDatabase();
+  }
+
+  return new Promise((resolve, reject) => {
+    if (getDBType() === 'sqlite' && sqliteDb) {
+      if (text.trim().toLowerCase().startsWith('select')) {
+        sqliteDb.all(text, params || [], (err: Error | null, rows: any[]) => {
+          if (err) reject(err);
+          else resolve(rows);
+        });
+      } else {
+        sqliteDb.run(text, params || [], function(err: Error | null) {
+          if (err) reject(err);
+          else resolve([]);
+        });
+      }
+    } else if (pool) {
+      pool.query(text, params)
+        .then(result => resolve(result.rows))
+        .catch(reject);
+    } else {
+      reject(new Error('Database not initialized'));
+    }
+  });
 };
 
-export default pool;
+export const getClient = async () => {
+  if (getDBType() === 'sqlite' && sqliteDb) {
+    return sqliteDb;
+  } else if (pool) {
+    return await pool.connect();
+  } else {
+    throw new Error('Database not initialized');
+  }
+};
 
-// Ensure pool is closed on process exit to avoid open handles in tests
-const closePoolGracefully = async () => {
+// Initialize on module load - REMOVED to allow dotenv loading first
+// const db = initDatabase();
+
+// Export a function to get the database instance instead
+export const getDatabase = () => {
+  if (getDBType() === 'sqlite') {
+    return sqliteDb || initDatabase();
+  } else {
+    return pool || initDatabase();
+  }
+};
+
+export default getDatabase;
+const closeDatabaseGracefully = async () => {
   try {
-    await pool.end();
-    logger.info('✅ PostgreSQL pool closed gracefully');
+    if (sqliteDb) {
+      sqliteDb.close((err: Error | null) => {
+        if (err) logger.error('Error closing SQLite:', err);
+        else logger.info('✅ SQLite database closed gracefully');
+      });
+    } else if (pool) {
+      await pool.end();
+      logger.info('✅ PostgreSQL pool closed gracefully');
+    }
   } catch (err) {
     // ignore
   }
 };
 
-process.once('beforeExit', () => {
-  void closePoolGracefully();
-});
-
-process.once('SIGINT', async () => {
-  await closePoolGracefully();
-  process.exit(0);
-});
+process.on('SIGINT', closeDatabaseGracefully);
+process.on('SIGTERM', closeDatabaseGracefully);

@@ -1,18 +1,6 @@
 "use client";
+import React from 'react';
 import Link from 'next/link';
-
-const posts = [
-  {
-    slug: 'dicas-de-limpeza-domestica',
-    title: '5 Dicas de Limpeza Doméstica para o Dia a Dia',
-    excerpt: 'Descubra truques simples para manter sua casa sempre limpa e organizada.'
-  },
-  {
-    slug: 'como-escolher-empresa-limpeza',
-    title: 'Como Escolher uma Empresa de Limpeza Profissional',
-    excerpt: 'Veja o que considerar na hora de contratar um serviço de limpeza.'
-  }
-];
 
 export default function BlogPage() {
   const [posts, setPosts] = React.useState<any[]>([]);

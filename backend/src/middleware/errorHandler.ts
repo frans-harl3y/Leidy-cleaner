@@ -23,22 +23,50 @@ export const errorHandler = (
   const status = err.status || 500;
   const message = err.message || 'Internal Server Error';
 
+  // Log detalhado do erro
   logger.error(`[${status}] ${message}`, {
     path: req.path,
     method: req.method,
-    error: err,
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+    error: {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      code: err.code
+    },
+    request: {
+      body: req.body,
+      query: req.query,
+      params: req.params,
+      headers: {
+        ...req.headers,
+        authorization: req.headers.authorization ? '[REDACTED]' : undefined
+      }
+    }
   });
+
+  // Em produção, enviar para serviço de monitoramento
+  if (process.env.NODE_ENV === 'production') {
+    // TODO: Integrar com Sentry/DataDog/NewRelic
+    console.error('PRODUCTION ERROR:', {
+      status,
+      message,
+      path: req.path,
+      timestamp: new Date().toISOString()
+    });
+  }
 
   const response: any = {
     error: {
-      message,
+      message: status === 500 ? 'Internal Server Error' : message,
       status,
+      timestamp: new Date().toISOString()
     },
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const env = process.env.NODE_ENV;
-  if (env === 'development') {
+  // Em desenvolvimento, incluir mais detalhes
+  if (process.env.NODE_ENV === 'development') {
     response.error.stack = err.stack;
     response.error.details = err;
   }

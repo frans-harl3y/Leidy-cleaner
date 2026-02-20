@@ -12,6 +12,10 @@ const authenticateToken = (req, res, next) => {
             throw (0, errorHandler_1.ApiError)('No token provided', 401);
         }
         const user = (0, jwt_1.verifyToken)(token);
+        // normalize id to string to avoid type mismatch between DB (number) and route params
+        if (user && user.id !== undefined) {
+            user.id = String(user.id);
+        }
         req.user = user;
         next();
     }

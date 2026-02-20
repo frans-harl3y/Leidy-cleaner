@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  # Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: avan-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - avan-network
+    restart: unless-stopped
+
   # Backend Service
   backend:
     build:
@@ -9,6 +24,8 @@ services:
     container_name: avan-backend
     ports:
       - "3001:3001"
+    expose:
+      - "3001"
     environment:
       - NODE_ENV=development
       - PORT=3001
@@ -17,6 +34,9 @@ services:
       - DB_NAME=vammos_dev
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - JWT_SECRET=dev_jwt_secret_change_me
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
     depends_on:
       db:
         condition: service_healthy
@@ -28,6 +48,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # Frontend Service
   frontend:
@@ -37,6 +58,8 @@ services:
     container_name: avan-frontend
     ports:
       - "3000:3000"
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -52,6 +75,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # Database (Postgres) for development
   db:

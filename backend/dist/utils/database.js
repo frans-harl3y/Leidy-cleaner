@@ -30,6 +30,7 @@ const query = async (text, params) => {
     }
     catch (error) {
         logger_1.logger.error('Database query error:', error);
+        console.error('Failed SQL:', text, 'Params:', params);
         throw error;
     }
 };

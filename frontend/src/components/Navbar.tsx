@@ -6,11 +6,28 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import React from 'react';
 import { apiClient } from '@/services/api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import {
+  Menu,
+  X,
+  User,
+  Settings,
+  LogOut,
+  Calendar,
+  Users,
+  BarChart3,
+  Home,
+  Briefcase,
+  Star,
+  ChevronDown
+} from 'lucide-react';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const [company, setCompany] = useState<{name: string; logoUrl: string} | null>(null);
 
@@ -21,96 +38,287 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     router.push('/');
+    setDropdownOpen(false);
+    setMobileMenuOpen(false);
   };
 
+  const navItems = [
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/services', label: 'Serviços', icon: Briefcase },
+    { href: '/staff-directory', label: 'Equipe', icon: Users },
+  ];
+
+  const authenticatedNavItems = [
+    { href: '/bookings', label: 'Agendamentos', icon: Calendar },
+  ];
+
+  const adminNavItems = [
+    { href: '/admin', label: 'Administração', icon: Settings },
+    { href: '/admin/bookings', label: 'Gerenciar Agendamentos', icon: Calendar },
+    { href: '/admin/reviews', label: 'Avaliações', icon: Star },
+  ];
+
+  const staffNavItems = [
+    { href: '/staff/bookings', label: 'Minhas Tarefas', icon: Calendar },
+  ];
+
   return (
-    <nav className="bg-blue-700 text-white shadow-lg">
+    <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center text-2xl font-bold">
-            <img
-              src={company?.logoUrl || '/leidy-logo.png'}
-              alt={company?.name || 'Limpar Plus'}
-              className="h-8 w-auto mr-2"
-            />
-            <span>{company?.name || 'Limpar Plus'}</span>
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              <img
+                src={company?.logoUrl || '/leidy-logo.png'}
+                alt={company?.name || 'Limpar Plus'}
+                className="w-8 h-8 object-contain"
+              />
+            </div>
+            <div className="hidden sm:block">
+              <span className="text-xl font-bold text-gray-900">
+                {company?.name || 'Limpar Plus'}
+              </span>
+            </div>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="hover:text-blue-100 transition">Home</Link>
-            <Link href="/services" className="hover:text-blue-100 transition">Serviços</Link>
-            <Link href="/staff-directory" className="hover:text-blue-100 transition">Equipe</Link>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
+              <Link key={item.href} href={item.href}>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </Button>
+              </Link>
+            ))}
 
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <>
-                <Link href="/bookings" className="hover:text-blue-100 transition">Meus Agendamentos</Link>
+                {authenticatedNavItems.map((item) => (
+                  <Link key={item.href} href={item.href}>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                ))}
 
                 {user?.role === 'admin' && (
-                  <>
-                    <Link href="/admin" className="hover:text-blue-100 transition font-semibold">Administração</Link>
-                    <Link href="/admin/bookings" className="hover:text-blue-100 transition">Agendamentos</Link>
-                    <Link href="/admin/reviews" className="hover:text-blue-100 transition">Avaliações</Link>
-                  </>
+                  <div className="relative">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2"
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      Admin
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                    {dropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        {adminNavItems.map((item) => (
+                          <Link key={item.href} href={item.href}>
+                            <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                              <item.icon className="w-4 h-4 text-gray-500" />
+                              <span className="text-sm text-gray-700">{item.label}</span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
+
                 {user?.role === 'staff' && (
                   <>
-                    <Link href="/staff/bookings" className="hover:text-blue-100 transition font-semibold">Minhas Tarefas</Link>
+                    {staffNavItems.map((item) => (
+                      <Link key={item.href} href={item.href}>
+                        <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Button>
+                      </Link>
+                    ))}
                   </>
                 )}
 
-                <div className="relative group">
-                  <button className="hover:text-blue-100 transition flex items-center space-x-1">
-                    <span>{user?.name || user?.email}</span>
-                    <span>▼</span>
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg hidden group-hover:block">
-                    <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">Perfil</Link>
-                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">Logout</button>
-                  </div>
+                {/* User Menu */}
+                <div className="relative ml-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                  >
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="hidden lg:block text-sm font-medium">
+                      {user?.name || user?.email}
+                    </span>
+                    <Badge variant="secondary" className="hidden xl:block text-xs">
+                      {user?.role === 'admin' ? 'Admin' : user?.role === 'staff' ? 'Equipe' : 'Cliente'}
+                    </Badge>
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-200">
+                        <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                        <p className="text-xs text-gray-500">{user?.email}</p>
+                        <Badge variant="outline" className="mt-1 text-xs">
+                          {user?.role === 'admin' ? 'Administrador' : user?.role === 'staff' ? 'Profissional' : 'Cliente'}
+                        </Badge>
+                      </div>
+
+                      <Link href="/profile">
+                        <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                          <User className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-700">Perfil</span>
+                        </div>
+                      </Link>
+
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-50 transition-colors text-red-600"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm">Sair</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="hover:text-blue-100 transition">Login</Link>
-                <Link href="/auth/register" className="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition">Registrar</Link>
-              </>
+            )}
+
+            {!isAuthenticated && (
+              <div className="flex items-center gap-2 ml-4">
+                <Link href="/auth/login">
+                  <Button variant="ghost" size="sm">
+                    Entrar
+                  </Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button size="sm">
+                    Cadastrar
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-white text-2xl">☰</button>
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
 
+        {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden pb-4 space-y-2">
-            <Link href="/" className="block py-2 hover:text-blue-100">Home</Link>
-            <Link href="/services" className="block py-2 hover:text-blue-100">Serviços</Link>
-            <Link href="/staff-directory" className="block py-2 hover:text-blue-100">Equipe</Link>
-            {isAuthenticated ? (
-              <>
-                <Link href="/bookings" className="block py-2 hover:text-blue-100">Meus Agendamentos</Link>
-                {user?.role === 'admin' && (
-                  <>
-                    <Link href="/admin" className="block py-2 hover:text-blue-100 font-semibold">Administração</Link>
-                    <Link href="/admin/bookings" className="block py-2 hover:text-blue-100">Agendamentos</Link>
-                    <Link href="/admin/reviews" className="block py-2 hover:text-blue-100">Avaliações</Link>
-                  </>
-                )}
-                {user?.role === 'staff' && (
-                  <>
-                    <Link href="/staff/bookings" className="block py-2 hover:text-blue-100 font-semibold">Minhas Tarefas</Link>
-                  </>
-                )}
-                <button onClick={handleLogout} className="block w-full text-left py-2 text-red-400 hover:text-red-300">Logout</button>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="block py-2 hover:text-blue-100">Login</Link>
-                <Link href="/auth/register" className="block py-2 hover:text-blue-100">Registrar</Link>
-              </>
-            )}
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {navItems.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <div className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                    <item.icon className="w-5 h-5 text-gray-500" />
+                    <span className="text-base text-gray-700">{item.label}</span>
+                  </div>
+                </Link>
+              ))}
+
+              {isAuthenticated && (
+                <>
+                  {authenticatedNavItems.map((item) => (
+                    <Link key={item.href} href={item.href}>
+                      <div className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                        <item.icon className="w-5 h-5 text-gray-500" />
+                        <span className="text-base text-gray-700">{item.label}</span>
+                      </div>
+                    </Link>
+                  ))}
+
+                  {user?.role === 'admin' && (
+                    <>
+                      {adminNavItems.map((item) => (
+                        <Link key={item.href} href={item.href}>
+                          <div className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                            <item.icon className="w-5 h-5 text-gray-500" />
+                            <span className="text-base text-gray-700">{item.label}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+
+                  {user?.role === 'staff' && (
+                    <>
+                      {staffNavItems.map((item) => (
+                        <Link key={item.href} href={item.href}>
+                          <div className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                            <item.icon className="w-5 h-5 text-gray-500" />
+                            <span className="text-base text-gray-700">{item.label}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+
+                  <div className="border-t border-gray-200 pt-3 mt-3">
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
+
+                    <Link href="/profile">
+                      <div className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 transition-colors">
+                        <User className="w-5 h-5 text-gray-500" />
+                        <span className="text-base text-gray-700">Perfil</span>
+                      </div>
+                    </Link>
+
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full px-3 py-3 rounded-md hover:bg-gray-50 transition-colors text-red-600"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span className="text-base">Sair</span>
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {!isAuthenticated && (
+                <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
+                  <Link href="/auth/login">
+                    <Button variant="outline" className="w-full justify-start" size="sm">
+                      Entrar
+                    </Button>
+                  </Link>
+                  <Link href="/auth/register">
+                    <Button className="w-full justify-start" size="sm">
+                      Cadastrar
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
+
+      {/* Overlay for mobile menu */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-25 z-40 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </nav>
   );
 }
