@@ -21,6 +21,9 @@ import staffRoutes from './routes/staff';
 const app: Express = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy for rate limiting
+app.set('trust proxy', 1);
+
 // Middleware de segurança
 app.use(helmet({
   contentSecurityPolicy: {
@@ -48,7 +51,7 @@ app.use(cors({
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://vammos.com',
+      'https://leidycleaner.com',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
@@ -138,7 +141,7 @@ app.get('/health', async (_req: Request, res: Response) => {
   } catch (error) {
     health.status = 'error';
     health.checks.database = false;
-    logger.error('Health check failed - Database error details:', error.message);
+    logger.error('Health check failed - Database error details:', (error as Error).message);
     logger.error('DB_TYPE:', process.env.DB_TYPE);
     logger.error('DATABASE_LOCAL:', process.env.DATABASE_LOCAL);
   }
@@ -179,7 +182,7 @@ app.use('/api/v1/staff', staffRoutes);
 // Status endpoint
 app.get('/api/v1/status', (_req: Request, res: Response) => {
   res.json({
-    message: 'Vammos API v1',
+    message: 'Leidy Cleaner API v1',
     status: 'running',
     version: '2.0.0',
     features: {
@@ -203,14 +206,16 @@ app.use((req: Request, res: Response) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  logger.info(`✅ Backend running on http://localhost:${PORT}`);
-  logger.info(`📚 API: http://localhost:${PORT}/api/v1`);
-  logger.info(`💚 Health: http://localhost:${PORT}/health`);
-  logger.info(`📊 Status: http://localhost:${PORT}/api/v1/status`);
-  logger.info(`🔐 Auth: http://localhost:${PORT}/api/v1/auth`);
-  logger.info(`🛍️  Services: http://localhost:${PORT}/api/v1/services`);
-});
+// Start server only if not being used as middleware
+if (!process.env.NEXT_INTEGRATION) {
+  app.listen(PORT, () => {
+    logger.info(`✅ Backend running on http://localhost:${PORT}`);
+    logger.info(`📚 API: http://localhost:${PORT}/api/v1`);
+    logger.info(`💚 Health: http://localhost:${PORT}/health`);
+    logger.info(`📊 Status: http://localhost:${PORT}/api/v1/status`);
+    logger.info(`🔐 Auth: http://localhost:${PORT}/api/v1/auth`);
+    logger.info(`🛍️  Services: http://localhost:${PORT}/api/v1/services`);
+  });
+}
 
 export default app;

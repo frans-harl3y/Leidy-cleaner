@@ -12,13 +12,19 @@ async function runMigrations() {
     try {
         logger_1.logger.info('🔄 Starting database migrations...');
         // Create migrations tracking table if it doesn't exist
-        await (0, database_1.query)(`
-      CREATE TABLE IF NOT EXISTS migrations (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL UNIQUE,
-        executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+        const dbType = process.env.DB_TYPE || 'postgres';
+        const createMigrationsTableSQL = dbType === 'sqlite'
+            ? `CREATE TABLE IF NOT EXISTS migrations (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE,
+          executed_at DATETIME DEFAULT datetime('now')
+        )`
+            : `CREATE TABLE IF NOT EXISTS migrations (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL UNIQUE,
+          executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`;
+        await (0, database_1.query)(createMigrationsTableSQL);
         logger_1.logger.info('📋 Migrations tracking table ready');
         // In test environment, clear migrations tracking so tests always apply current SQL
         if (process.env.NODE_ENV === 'test') {
@@ -27,7 +33,11 @@ async function runMigrations() {
         }
         // Read all migration files
         const migrationsDir = path_1.default.join(__dirname, '../../migrations');
-        const migrationFiles = fs_1.default.readdirSync(migrationsDir)
+        // Use SQLite migrations if DB_TYPE is sqlite
+        const actualMigrationsDir = dbType === 'sqlite'
+            ? path_1.default.join(__dirname, '../../migrations_sqlite')
+            : migrationsDir;
+        const migrationFiles = fs_1.default.readdirSync(actualMigrationsDir)
             .filter(file => file.endsWith('.sql'))
             .sort();
         logger_1.logger.info(`Found ${migrationFiles.length} migration files`);
@@ -40,7 +50,7 @@ async function runMigrations() {
                 continue;
             }
             // Read and execute migration
-            const filePath = path_1.default.join(migrationsDir, file);
+            const filePath = path_1.default.join(actualMigrationsDir, file);
             const sql = fs_1.default.readFileSync(filePath, 'utf-8');
             logger_1.logger.info(`🚀 Executing migration: ${migrationName}`);
             // Execute all statements in the SQL file

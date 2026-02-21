@@ -29,3 +29,13 @@ export function validateBooking(payload: { bookingDate?: string | Date; address?
   if (!payload.address || String(payload.address).trim().length < 5) return 'Endereço inválido';
   return null;
 }
+
+// Default export with all validators
+const validators = {
+  validateService,
+  validateAuth,
+  validateRegister,
+  validateBooking,
+};
+
+export default validators;

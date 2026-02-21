@@ -87,7 +87,7 @@ exports.MOCK_SERVICES = [
 exports.MOCK_USERS = [
     {
         id: 'admin-1',
-        email: 'admin@vammos.com',
+        email: 'admin@leidycleaner.com',
         password_hash: '$2b$12$example_hash',
         name: 'Administrador',
         phone: '(11) 99999-9999',
@@ -97,8 +97,8 @@ exports.MOCK_USERS = [
 ];
 exports.MOCK_COMPANY = {
     id: '1',
-    name: 'Limpar Plus',
-    legal_name: 'Limpar Plus LTDA',
+    name: 'Leidy Cleaner',
+    legal_name: 'Leidy Cleaner LTDA',
     email: 'contato@limparplus.com.br',
     phone: '(11) 3333-3333',
     address: 'Rua das Flores, 123, São Paulo, SP',

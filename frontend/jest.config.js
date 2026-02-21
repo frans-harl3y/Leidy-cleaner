@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
@@ -8,10 +8,7 @@ module.exports = {
   moduleDirectories: ['node_modules', 'src'],
   moduleNameMapper: {
     '^@\/(.*)$': '<rootDir>/src/$1',
-    '^.+\\.(css|scss|sass)$': 'identity-obj-proxy',
-    '^.+\\.(jpg|jpeg|png|gif|svg|webp)$': '<rootDir>/__mocks__/fileMock.js',
-    '^next\\/image$': '<rootDir>/__mocks__/next/image.js',
-    '^next\\/link$': '<rootDir>/__mocks__/next/link.js'
+    '^.+\\.[css|scss|sass]+$': 'identity-obj-proxy',
   },
   testPathIgnorePatterns: ['/node_modules/', '/.next/', '/tests/']
 }

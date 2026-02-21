@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import CalendarPlaceholder from '@/components/CalendarPlaceholder';
 import { apiClient } from '@/services/api';
+import validators from '@/utils/validators';
 
 interface BookingFormProps {
   serviceId: string;
@@ -24,7 +25,7 @@ export default function BookingForm({ serviceId, initialDate = '', initialAddres
     setError('');
     setLoading(true);
     try {
-      const v = require('@/utils/validators');
+      const v = validators;
       const err = v.validateBooking({ bookingDate: date, address, notes });
       if (err) {
         setError(err);

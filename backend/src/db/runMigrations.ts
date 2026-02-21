@@ -34,7 +34,6 @@ async function runMigrations() {
     // Read all migration files
     const migrationsDir = path.join(__dirname, '../../migrations');
     // Use SQLite migrations if DB_TYPE is sqlite
-    const dbType = process.env.DB_TYPE || 'postgres';
     const actualMigrationsDir = dbType === 'sqlite'
       ? path.join(__dirname, '../../migrations_sqlite')
       : migrationsDir;

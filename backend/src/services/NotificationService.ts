@@ -18,7 +18,7 @@ export class NotificationService {
     try {
       const transporter = this.getTransporter();
       await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'noreply@vammos.com',
+        from: process.env.SMTP_FROM || 'noreply@leidycleaner.com',
         to,
         subject,
         text,

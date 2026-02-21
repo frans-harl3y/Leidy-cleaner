@@ -1,6 +1,5 @@
-import pg from 'pg';
-declare const pool: pg.Pool;
 export declare const query: (text: string, params?: any[]) => Promise<any[]>;
-export declare const getClient: () => Promise<pg.PoolClient>;
-export default pool;
+export declare const getClient: () => Promise<any>;
+export declare const getDatabase: () => any;
+export default getDatabase;
 //# sourceMappingURL=database.d.ts.map

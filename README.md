@@ -1,4 +1,4 @@
-# Vammos - Plataforma de Serviços de Limpeza Empresarial
+# Leidy Cleaner - Plataforma de Serviços de Limpeza Empresarial
 
 **Status**: MVP v1 - Backend ✅ | Frontend 🚧
 
@@ -61,12 +61,11 @@ npm run dev:single-port
 npm run setup:local
 
 # Iniciar desenvolvimento
-npm run dev:local
+npm run dev
 
 # Acessar:
-# - Frontend: http://localhost:3000
-# - Backend: http://localhost:3001
-# - Health: http://localhost:3001/health
+# - Frontend + API: http://localhost:3000
+# - Health: http://localhost:3000/api/health
 ```
 
 ### Opção 3: Via Docker (Produção)
@@ -143,10 +142,9 @@ Password: admin123456
 
 | Serviço | URL |
 |---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend | http://localhost:3001 |
-| Health Check | http://localhost:3001/health |
-| API Status | http://localhost:3001/api/v1/status |
+| Frontend + API | http://localhost:3000 |
+| Health Check | http://localhost:3000/api/health |
+| API Status | http://localhost:3000/api/v1/status |
 
 ## 📦 Estrutura do Projeto
 
@@ -281,7 +279,7 @@ npm run type-check
 ### Docker Compose
 ```bash
 docker-compose up -d
-# Frontend: :3000, Backend: :3001, Postgres: :5432
+# Frontend + API: :3000, Postgres: :5432
 ```
 
 ### GitHub Actions

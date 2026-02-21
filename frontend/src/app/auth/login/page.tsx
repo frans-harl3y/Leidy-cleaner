@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
+import useToast from '@/components/useToast';
+import validators from '@/utils/validators';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,8 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
-  const toastHook = require('@/components/useToast').default;
-  const { show } = toastHook();
+  const { show } = useToast();
 
   if (isAuthenticated) {
     router.push('/');
@@ -26,7 +27,7 @@ export default function LoginPage() {
     setLoading(true);
 
     // client-side validation
-    const v = require('@/utils/validators');
+    const v = validators;
     const err = v.validateAuth(email, password);
     if (err) {
       setError(err);

@@ -1,4 +1,4 @@
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { AuthRequest, asyncHandler, ApiError } from '../middleware/errorHandler';
 import PaymentService from '../services/PaymentService';
 import BookingService from '../services/BookingService';
@@ -99,7 +99,7 @@ export class PaymentController {
     });
   });
 
-  static webhook = asyncHandler(async (req: Request, res: Response) => {
+  static webhook = asyncHandler(async (req: AuthRequest, res: Response) => {
     const event = req.body;
 
     // Handle Stripe webhook events

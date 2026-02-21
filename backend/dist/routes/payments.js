@@ -10,5 +10,7 @@ const router = (0, express_1.Router)();
 router.post('/', auth_1.authenticateToken, PaymentController_1.default.payBooking);
 router.post('/pix', auth_1.authenticateToken, PaymentController_1.default.pixPayment);
 router.post('/pix/confirm', auth_1.authenticateToken, PaymentController_1.default.confirmPixPayment);
+router.post('/checkout', auth_1.authenticateToken, PaymentController_1.default.checkout);
+router.post('/webhook', PaymentController_1.default.webhook);
 exports.default = router;
 //# sourceMappingURL=payments.js.map

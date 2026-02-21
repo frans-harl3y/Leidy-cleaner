@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
+import useToast from '@/components/useToast';
+import validators from '@/utils/validators';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -17,8 +19,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const { register, isAuthenticated } = useAuth();
   const router = useRouter();
-  const toastHook = require('@/components/useToast').default;
-  const { show } = toastHook();
+  const { show } = useToast();
 
   if (isAuthenticated) {
     router.push('/');
@@ -34,7 +35,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    const v = require('@/utils/validators');
+    const v = validators;
     const err = v.validateRegister(formData);
     if (err) {
       setError(err);

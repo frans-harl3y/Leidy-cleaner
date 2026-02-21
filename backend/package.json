@@ -1,7 +1,7 @@
 {
-  "name": "limpezapro-backend",
+  "name": "leidycleaner-backend",
   "version": "1.0.0",
-  "description": "Backend Express para plataforma de limpeza",
+  "description": "Backend Express para plataforma Leidy Cleaner",
   "main": "src/index.js",
   "scripts": {
     "build": "tsc",
@@ -23,7 +23,7 @@
     "migrate": "tsx src/db/runMigrations.ts",
     "seed": "tsx src/db/seed.ts",
     "db:init": "node scripts/initDb.js",
-    "health": "curl -f http://localhost:3001/health || exit 1",
+    "health": "curl -f http://localhost:3000/api/health || exit 1",
     "backup": "bash ../../backup.sh",
     "restore": "bash ../../restore.sh",
     "queue:worker": "node src/workers/emailQueueWorker.js",

@@ -75,5 +75,42 @@ PaymentController.confirmPixPayment = (0, errorHandler_1.asyncHandler)(async (re
         throw (0, errorHandler_1.ApiError)('Failed to update booking', 500);
     res.status(200).json({ message: 'PIX payment confirmed', data: { booking: updated } });
 });
+PaymentController.checkout = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    if (!req.user)
+        throw (0, errorHandler_1.ApiError)('Not authenticated', 401);
+    const { bookingId } = req.body;
+    if (!bookingId)
+        throw (0, errorHandler_1.ApiError)('bookingId is required', 400);
+    const booking = await BookingService_1.default.getById(bookingId);
+    if (!booking)
+        throw (0, errorHandler_1.ApiError)('Booking not found', 404);
+    if (req.user.role !== 'admin' && req.user.role !== 'staff' && String(booking.user_id) !== req.user.id) {
+        throw (0, errorHandler_1.ApiError)('Insufficient permissions', 403);
+    }
+    // When Stripe is not configured, fallback to direct payment
+    const updated = await PaymentService_1.default.markBookingPaid(bookingId);
+    if (!updated)
+        throw (0, errorHandler_1.ApiError)('Failed to update booking', 500);
+    res.status(200).json({
+        message: 'Payment processed (fallback mode)',
+        data: { booking: updated }
+    });
+});
+PaymentController.webhook = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const event = req.body;
+    // Handle Stripe webhook events
+    if (event.type === 'checkout.session.completed') {
+        const bookingId = event.data?.object?.metadata?.bookingId;
+        if (bookingId) {
+            const updated = await PaymentService_1.default.markBookingPaid(bookingId);
+            if (!updated) {
+                console.error('Failed to update booking payment status');
+                res.status(500).json({ error: 'Failed to process payment' });
+                return;
+            }
+        }
+    }
+    res.status(200).json({ received: true });
+});
 exports.default = PaymentController;
 //# sourceMappingURL=PaymentController.js.map

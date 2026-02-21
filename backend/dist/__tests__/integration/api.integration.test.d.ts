@@ -1,5 +1,5 @@
 /**
- * Integration Tests for Vammos Backend API
+ * Integration Tests for Leidy Cleaner Backend API
  *
  * These tests validate:
  * 1. Database migrations run successfully

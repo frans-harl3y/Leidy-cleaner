@@ -1,4 +1,4 @@
-require('@testing-library/jest-dom');
+import '@testing-library/jest-dom';
 
 // mock Next.js app router hooks for tests
 jest.mock('next/navigation', () => ({

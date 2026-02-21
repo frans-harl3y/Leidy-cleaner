@@ -1,6 +1,6 @@
 /**
- * Integration Tests for Vammos Backend API
- * 
+ * Integration Tests for Leidy Cleaner Backend API
+ *
  * These tests validate:
  * 1. Database migrations run successfully
  * 2. Seed data is created properly
@@ -58,7 +58,7 @@ app.get('/health', (_req, res) => {
 // Error handling
 app.use(errorHandler);
 
-describe('Vammos API Integration Tests', () => {
+describe('Leidy Cleaner API Integration Tests', () => {
   describe('Health Check', () => {
     test('GET /health should return OK status', async () => {
       const response = await request(app)
@@ -71,7 +71,7 @@ describe('Vammos API Integration Tests', () => {
 
   describe('Authentication Flow', () => {
     const testUser = {
-      email: `testuser${Date.now()}_${Math.random().toString(36).slice(2, 9)}@vammos.com`,
+      email: `testuser${Date.now()}_${Math.random().toString(36).slice(2, 9)}@leidycleaner.com`,
       password: 'TestPassword123!',
       name: 'Test User',
       phone: '11987654321'
@@ -164,7 +164,7 @@ describe('Vammos API Integration Tests', () => {
       const userRes = await request(app)
         .post('/api/v1/auth/register')
         .send({
-          email: `serviceuser_${uniqueId}@vammos.com`,
+          email: `serviceuser_${uniqueId}@leidycleaner.com`,
           password: 'Password123!',
           name: 'Service User',
           phone: '11987654321'
@@ -174,11 +174,11 @@ describe('Vammos API Integration Tests', () => {
         userToken = userRes.body.data.tokens.accessToken;
       }
 
-      // Use seeded admin account (email: admin@vammos.com, password: admin123456)
+      // Use seeded admin account (email: admin@leidycleaner.com, password: admin123456)
       const adminRes = await request(app)
         .post('/api/v1/auth/login')
         .send({
-          email: 'admin@vammos.com',
+          email: 'admin@leidycleaner.com',
           password: 'admin123456'
         });
 
@@ -481,7 +481,7 @@ describe('Vammos API Integration Tests', () => {
     let staffToken: string;
     beforeAll(async () => {
       // create staff user with unique email
-      const staffEmail = `staff_${Date.now()}_${Math.random().toString(36).slice(2, 9)}@vammos.com`;
+      const staffEmail = `staff_${Date.now()}_${Math.random().toString(36).slice(2, 9)}@leidycleaner.com`;
       const staffPassword = 'StaffPassword123!';
       
       const staffRes = await request(app)
@@ -603,7 +603,7 @@ describe('Vammos API Integration Tests', () => {
 
       test('Another staff cannot update profile', async () => {
         // create second staff with unique email
-        const staff2Email = `staff2_${Date.now()}_${Math.random().toString(36).slice(2, 9)}@vammos.com`;
+        const staff2Email = `staff2_${Date.now()}_${Math.random().toString(36).slice(2, 9)}@leidycleaner.com`;
         
         const other = await request(app)
           .post('/api/v1/auth/register')
@@ -856,7 +856,7 @@ describe('Vammos API Integration Tests', () => {
 
     test('Duplicate email on register returns 400', async () => {
       const user = {
-        email: 'duplicate@vammos.com',
+        email: 'duplicate@leidycleaner.com',
         password: 'Password123!',
         name: 'Test User',
         phone: '11987654321'

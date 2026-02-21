@@ -14,6 +14,24 @@ module.exports = async () => {
   try {
     console.log('🔄 Database setup: Reading migration files...');
     
+    // First, drop all tables to ensure clean state
+    console.log('🧹 Dropping existing tables...');
+    try {
+      await pool.query(`
+        DROP TABLE IF EXISTS reviews CASCADE;
+        DROP TABLE IF EXISTS bookings CASCADE;
+        DROP TABLE IF EXISTS services CASCADE;
+        DROP TABLE IF EXISTS users CASCADE;
+        DROP TABLE IF EXISTS company_info CASCADE;
+        DROP TABLE IF EXISTS staff_availability CASCADE;
+      `);
+      console.log('✅ Existing tables dropped');
+    } catch (dropErr) {
+      console.error('❌ Error dropping tables:', dropErr.message);
+      console.error('Stack:', dropErr.stack);
+      // Continue anyway
+    }
+    
     // Read all migration files
     const migrationsDir = path.join(__dirname, './migrations');
     const migrationFiles = fs.readdirSync(migrationsDir)

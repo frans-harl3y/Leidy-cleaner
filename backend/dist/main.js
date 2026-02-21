@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const logger_1 = require("./utils/logger");
 const sanitize_1 = require("./middleware/sanitize");
 const errorHandler_1 = require("./middleware/errorHandler");
@@ -20,9 +21,10 @@ const company_1 = __importDefault(require("./routes/company"));
 const admin_1 = __importDefault(require("./routes/admin"));
 const reviews_1 = __importDefault(require("./routes/reviews"));
 const staff_1 = __importDefault(require("./routes/staff"));
-dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3001;
+// Trust proxy for rate limiting
+app.set('trust proxy', 1);
 // Middleware de segurança
 app.use((0, helmet_1.default)({
     contentSecurityPolicy: {
@@ -49,7 +51,7 @@ app.use((0, cors_1.default)({
         const allowedOrigins = [
             'http://localhost:3000',
             'http://localhost:3001',
-            'https://vammos.com',
+            'https://leidycleaner.com',
             process.env.FRONTEND_URL
         ].filter(Boolean);
         if (allowedOrigins.includes(origin)) {
@@ -118,13 +120,19 @@ app.get('/health', async (_req, res) => {
     try {
         // Verificar conectividade com banco
         const { query } = require('./utils/database');
-        await query('SELECT 1');
+        logger_1.logger.info('Testing database connection...');
+        // Small delay for SQLite initialization
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const result = await query('SELECT 1 as test');
+        logger_1.logger.info('Database test result:', result);
         health.checks.database = true;
     }
     catch (error) {
         health.status = 'error';
         health.checks.database = false;
-        logger_1.logger.error('Health check failed - Database:', error);
+        logger_1.logger.error('Health check failed - Database error details:', error.message);
+        logger_1.logger.error('DB_TYPE:', process.env.DB_TYPE);
+        logger_1.logger.error('DATABASE_LOCAL:', process.env.DATABASE_LOCAL);
     }
     // Verificar uso de memória
     const memUsage = process.memoryUsage();
@@ -157,7 +165,7 @@ app.use('/api/v1/staff', staff_1.default);
 // Status endpoint
 app.get('/api/v1/status', (_req, res) => {
     res.json({
-        message: 'Vammos API v1',
+        message: 'Leidy Cleaner API v1',
         status: 'running',
         version: '2.0.0',
         features: {
@@ -178,14 +186,16 @@ app.use((req, res) => {
 });
 // Error handler (must be last)
 app.use(errorHandler_1.errorHandler);
-// Start server
-app.listen(PORT, () => {
-    logger_1.logger.info(`✅ Backend running on http://localhost:${PORT}`);
-    logger_1.logger.info(`📚 API: http://localhost:${PORT}/api/v1`);
-    logger_1.logger.info(`💚 Health: http://localhost:${PORT}/health`);
-    logger_1.logger.info(`📊 Status: http://localhost:${PORT}/api/v1/status`);
-    logger_1.logger.info(`🔐 Auth: http://localhost:${PORT}/api/v1/auth`);
-    logger_1.logger.info(`🛍️  Services: http://localhost:${PORT}/api/v1/services`);
-});
+// Start server only if not being used as middleware
+if (!process.env.NEXT_INTEGRATION) {
+    app.listen(PORT, () => {
+        logger_1.logger.info(`✅ Backend running on http://localhost:${PORT}`);
+        logger_1.logger.info(`📚 API: http://localhost:${PORT}/api/v1`);
+        logger_1.logger.info(`💚 Health: http://localhost:${PORT}/health`);
+        logger_1.logger.info(`📊 Status: http://localhost:${PORT}/api/v1/status`);
+        logger_1.logger.info(`🔐 Auth: http://localhost:${PORT}/api/v1/auth`);
+        logger_1.logger.info(`🛍️  Services: http://localhost:${PORT}/api/v1/services`);
+    });
+}
 exports.default = app;
 //# sourceMappingURL=main.js.map
