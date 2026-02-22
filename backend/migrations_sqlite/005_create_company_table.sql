@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS company_info (
   logo_url TEXT,
   description TEXT,
   terms TEXT,
-  created_at DATETIME DEFAULT datetime('now'),
-  updated_at DATETIME DEFAULT datetime('now')
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

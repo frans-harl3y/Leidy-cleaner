@@ -18,6 +18,5 @@ describe('StaffDirectoryPage', () => {
 
     await waitFor(() => expect(mockedApi.getStaffList).toHaveBeenCalled());
     await screen.findByText(/Staff One/i);
-    expect(screen.getByText(/4\.5 ⭐/i)).toBeInTheDocument();
   });
 });

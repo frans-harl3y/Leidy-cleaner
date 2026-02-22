@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, rerender } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import BookingForm from '../BookingForm';
 import { apiClient } from '@/services/api';
 
@@ -19,7 +19,7 @@ describe('BookingForm', () => {
     mockedApi.createBooking.mockResolvedValue({ id: 'b1' } as any);
 
     const onSuccess = jest.fn();
-    const { rerender } = render(<BookingForm serviceId="svc1" onSuccess={onSuccess} />);
+    const renderResult = render(<BookingForm serviceId="svc1" onSuccess={onSuccess} />);
 
     // wait for staff dropdown to appear
     await screen.findByText(/Staff One/i);
@@ -27,14 +27,14 @@ describe('BookingForm', () => {
     // use initialDate prop to avoid interacting with date picker
     const future = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     // rerender with initialDate set
-    rerender(
+    renderResult.rerender(
       <BookingForm serviceId="svc1" initialDate={future} onSuccess={onSuccess} />
     );
     // fill address and select staff
     fireEvent.change(screen.getByLabelText(/Endereço/i), { target: { value: 'Rua Teste' } });
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'st1' } });
 
-    fireEvent.click(screen.getByText(/Agendar/i));
+    fireEvent.click(screen.getByText(/Confirmar Agendamento/i));
 
     await waitFor(() => expect(mockedApi.createBooking).toHaveBeenCalled());
     expect(mockedApi.createBooking).toHaveBeenCalledWith(expect.objectContaining({ staffId: 'st1' }));

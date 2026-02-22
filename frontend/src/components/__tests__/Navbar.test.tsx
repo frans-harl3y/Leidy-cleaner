@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Navbar from '../Navbar';
 import { AuthContext } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
@@ -9,7 +9,7 @@ const mockedApi = apiClient as jest.Mocked<typeof apiClient>;
 
 function renderWithAuth(user: any) {
   render(
-    <AuthContext.Provider value={{ isAuthenticated: !!user, user, login: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, user, loading: false, login: jest.fn(), register: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
       <Navbar />
     </AuthContext.Provider>
   );
@@ -28,7 +28,7 @@ describe('Navbar', () => {
     expect(screen.getByText(/Home/i)).toBeInTheDocument();
     expect(screen.getByText(/Serviços/i)).toBeInTheDocument();
     expect(screen.getByText(/Equipe/i)).toBeInTheDocument();
-    expect(screen.getByText(/Login/i)).toBeInTheDocument();
+    expect(screen.getByText(/Entrar/i)).toBeInTheDocument();
   });
 
   it('shows admin links when user is admin', async () => {
@@ -36,7 +36,9 @@ describe('Navbar', () => {
     await screen.findByAltText(/Limpar Plus/i);
     const adminLinks = screen.getAllByText(/Admin/i);
     expect(adminLinks.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Bookings/i)).toBeInTheDocument();
-    expect(screen.getByText(/Reviews/i)).toBeInTheDocument();
+    fireEvent.click(adminLinks[0]);
+    await screen.findByText(/Gerenciar Agendamentos/i);
+    expect(screen.getByText(/Gerenciar Agendamentos/i)).toBeInTheDocument();
+    expect(screen.getByText(/Avaliações/i)).toBeInTheDocument();
   });
 });

@@ -4,6 +4,6 @@ import HomePage from '../app/page';
 describe('HomePage', () => {
   it('renders the homepage', () => {
     render(<HomePage />);
-    expect(screen.getByText(/Vammos/i)).toBeInTheDocument();
+    expect(screen.getByText(/Você Merece/i)).toBeInTheDocument();
   });
 });

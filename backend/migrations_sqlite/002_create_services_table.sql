@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS services (
   base_price DECIMAL(10, 2) NOT NULL,
   duration_minutes INTEGER NOT NULL,
   is_active INTEGER DEFAULT 1,
-  created_at DATETIME DEFAULT datetime('now'),
-  updated_at DATETIME DEFAULT datetime('now')
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create indexes

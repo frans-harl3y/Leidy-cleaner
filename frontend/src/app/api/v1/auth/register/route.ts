@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Determine role: first registered user becomes admin
     const adminCheck = await pool.query("SELECT COUNT(*) as count FROM users WHERE role = 'admin'");
-    const roleToAssign = parseInt(adminCheck.rows[0].count) === 0 ? 'admin' : 'user';
+    const roleToAssign = parseInt(adminCheck.rows[0].count) === 0 ? 'admin' : 'customer';
 
     // Hash password
     const passwordHash = await hashPassword(password);

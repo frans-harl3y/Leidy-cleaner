@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest, asyncHandler, ApiError } from '../middleware/errorHandler';
 import { AuthService } from '../services/AuthService';
-import { registerSchema, loginSchema, refreshTokenSchema } from '../utils/schemas';
+import { registerSchema, loginSchema } from '../utils/schemas';
 
 export class AuthController {
   static register = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -14,6 +14,15 @@ export class AuthController {
     const { email, password, name, phone } = value;
 
     const result = await AuthService.register(email, password, name, phone);
+
+    // Set refresh token as HttpOnly cookie (also return tokens in body for backwards compatibility)
+    const refreshCookieMaxAge = Number(process.env.JWT_REFRESH_MAX_AGE_MS) || 7 * 24 * 60 * 60 * 1000; // 7 days default
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: refreshCookieMaxAge,
+    });
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -38,6 +47,14 @@ export class AuthController {
 
     const result = await AuthService.login(email, password);
 
+    const refreshCookieMaxAge = Number(process.env.JWT_REFRESH_MAX_AGE_MS) || 7 * 24 * 60 * 60 * 1000; // 7 days default
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: refreshCookieMaxAge,
+    });
+
     res.status(200).json({
       message: 'User logged in successfully',
       data: {
@@ -51,15 +68,22 @@ export class AuthController {
   });
 
   static refreshToken = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { error, value } = refreshTokenSchema.validate(req.body);
+    // Accept refresh token from body or HttpOnly cookie
+    const refreshToken = (req.body && (req.body as any).refreshToken) || (req.cookies && (req.cookies as any).refreshToken);
 
-    if (error) {
-      throw ApiError(error.details[0].message, 400);
+    if (!refreshToken) {
+      throw ApiError('Refresh token required', 400);
     }
 
-    const { refreshToken } = value;
-
     const tokens = await AuthService.refreshToken(refreshToken);
+
+    const refreshCookieMaxAge = Number(process.env.JWT_REFRESH_MAX_AGE_MS) || 7 * 24 * 60 * 60 * 1000; // 7 days default
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: refreshCookieMaxAge,
+    });
 
     res.status(200).json({
       message: 'Token refreshed successfully',

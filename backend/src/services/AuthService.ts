@@ -26,7 +26,7 @@ export class AuthService {
     const adminCheck = await query("SELECT COUNT(*) as count FROM users WHERE role = 'admin'");
     const roleToAssign = ((adminCheck as any[])[0] as any).count === '0' || ((adminCheck as any[])[0] as any).count === 0
       ? 'admin'
-      : 'user';
+      : 'customer';
 
     // Hash password
     const passwordHash = await hashPassword(password);

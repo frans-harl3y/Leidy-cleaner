@@ -9,7 +9,7 @@ const mockedApi = apiClient as jest.Mocked<typeof apiClient>;
 
 function renderWithAuth(children: React.ReactNode) {
   return render(
-    <AuthContext.Provider value={{ isAuthenticated: true, user: { id: 'a', role: 'admin' }, login: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
+    <AuthContext.Provider value={{ isAuthenticated: true, user: { id: 'a', role: 'admin', email: 'a@x.com', name: 'Admin' }, loading: false, login: jest.fn(), register: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
       {children}
     </AuthContext.Provider>
   );

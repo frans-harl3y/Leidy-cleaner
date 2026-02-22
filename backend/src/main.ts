@@ -2,10 +2,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express, { Express, Request, Response } from 'express';
+import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { logger } from './utils/logger';
 import { sanitizeInput } from './middleware/sanitize';
 import { errorHandler } from './middleware/errorHandler';
@@ -24,6 +26,7 @@ const PORT = process.env.PORT || 3001;
 // Trust proxy for rate limiting
 app.set('trust proxy', 1);
 
+let server: http.Server | null = null;
 // Middleware de segurança
 app.use(helmet({
   contentSecurityPolicy: {
@@ -53,9 +56,10 @@ app.use(cors({
       'http://localhost:3001',
       'https://leidycleaner.com',
       process.env.FRONTEND_URL
-    ].filter(Boolean);
+    ].filter(Boolean) as string[];
 
-    if (allowedOrigins.includes(origin)) {
+    // Accept exact match or allow origins that start with an allowed origin
+    if (allowedOrigins.includes(origin) || allowedOrigins.some(o => origin.startsWith(o))) {
       return callback(null, true);
     }
 
@@ -66,6 +70,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
+// Cookie parser to read HttpOnly cookies (refresh tokens)
+app.use(cookieParser());
+
 // Request logging
 app.use(morgan('combined', {
   stream: {
@@ -74,14 +81,6 @@ app.use(morgan('combined', {
 }));
 
 // Rate limiting
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 5, // Mais restritivo para auth
@@ -101,7 +100,6 @@ const apiLimiter = rateLimit({
 // Aplicar rate limiting
 app.use('/api/v1/auth', authLimiter);
 app.use('/api/v1', apiLimiter);
-app.use(generalLimiter);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -208,7 +206,7 @@ app.use(errorHandler);
 
 // Start server only if not being used as middleware
 if (!process.env.NEXT_INTEGRATION) {
-  app.listen(PORT, () => {
+  server = app.listen(PORT, () => {
     logger.info(`✅ Backend running on http://localhost:${PORT}`);
     logger.info(`📚 API: http://localhost:${PORT}/api/v1`);
     logger.info(`💚 Health: http://localhost:${PORT}/health`);
@@ -217,5 +215,20 @@ if (!process.env.NEXT_INTEGRATION) {
     logger.info(`🛍️  Services: http://localhost:${PORT}/api/v1/services`);
   });
 }
+
+// Helper to close the server (used in tests to let Jest exit cleanly)
+export const closeServer = async () => {
+  return new Promise<void>((resolve) => {
+    if (server) {
+      server.close(() => {
+        logger.info('✅ HTTP server closed');
+        server = null;
+        resolve();
+      });
+    } else {
+      resolve();
+    }
+  });
+};
 
 export default app;

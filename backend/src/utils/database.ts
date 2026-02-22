@@ -85,18 +85,54 @@ export const query = async (text: string, params?: any[]): Promise<any[]> => {
   if ((getDBType() === 'sqlite' && !sqliteDb) || (getDBType() !== 'sqlite' && !pool)) {
     initDatabase();
   }
-
   return new Promise((resolve, reject) => {
     if (getDBType() === 'sqlite' && sqliteDb) {
-      if (text.trim().toLowerCase().startsWith('select')) {
-        sqliteDb.all(text, params || [], (err: Error | null, rows: any[]) => {
+      // Preprocess SQL for SQLite compatibility
+      let sql = text;
+      const wantsReturning = /RETURNING\s+/i.test(sql);
+      if (wantsReturning) {
+        sql = sql.replace(/RETURNING[\s\S]*$/i, '');
+      }
+      sql = sql.replace(/\bNOW\(\)/ig, 'CURRENT_TIMESTAMP');
+
+      const trimmed = sql.trim().toLowerCase();
+
+      if (trimmed.startsWith('select')) {
+        sqliteDb.all(sql, params || [], (err: Error | null, rows: any[]) => {
           if (err) reject(err);
           else resolve(rows);
         });
       } else {
-        sqliteDb.run(text, params || [], function(err: Error | null) {
-          if (err) reject(err);
-          else resolve([]);
+        sqliteDb.run(sql, params || [], function(this: any, err: Error | null) {
+          if (err) return reject(err);
+
+          if (wantsReturning) {
+            // Try to detect table name for INSERT/UPDATE to fetch the affected row
+            const insertMatch = sql.match(/insert\s+into\s+["'`]?([a-zA-Z0-9_]+)["'`]?/i);
+            const updateMatch = sql.match(/update\s+["'`]?([a-zA-Z0-9_]+)["'`]?/i);
+
+            if (insertMatch) {
+              const table = insertMatch[1];
+              const lastID = this && this.lastID;
+              sqliteDb.all(`SELECT * FROM ${table} WHERE id = ?`, [lastID], (err2: Error | null, rows: any[]) => {
+                if (err2) reject(err2);
+                else resolve(rows);
+              });
+            } else if (updateMatch) {
+              const table = updateMatch[1];
+              // Assume the id was passed as the last parameter for updates using RETURNING
+              const idParam = params && params.length ? params[params.length - 1] : null;
+              if (idParam == null) return resolve([]);
+              sqliteDb.all(`SELECT * FROM ${table} WHERE id = ?`, [idParam], (err2: Error | null, rows: any[]) => {
+                if (err2) reject(err2);
+                else resolve(rows);
+              });
+            } else {
+              resolve([]);
+            }
+          } else {
+            resolve([]);
+          }
         });
       }
     } else if (pool) {
@@ -150,3 +186,6 @@ const closeDatabaseGracefully = async () => {
 
 process.on('SIGINT', closeDatabaseGracefully);
 process.on('SIGTERM', closeDatabaseGracefully);
+
+// Exported helper to allow tests to close DB connections gracefully
+export const closeDatabase = closeDatabaseGracefully;
