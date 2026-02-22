@@ -8,14 +8,14 @@ async function seedDatabase() {
 
     // For tests, use direct database connection to avoid module conflicts
     let testQuery = query;
-    if (process.env.NODE_ENV === 'test') {
+    if (process.env.NODE_ENV === 'test' && process.env.DB_TYPE !== 'sqlite') {
       const { Pool } = require('pg');
       const testPool = new Pool({
-        host: 'localhost',
-        port: 5432,
-        database: 'postgres',
-        user: 'postgres',
-        password: 'postgres',
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432'),
+        database: process.env.DB_NAME || 'postgres',
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD || 'postgres',
       });
 
       // Use direct pool query for tests
@@ -89,7 +89,7 @@ async function seedDatabase() {
     if (companyCount === 0) {
       await testQuery(
         `INSERT INTO company_info (name, legal_name, email, phone, address, city, state, country, postal_code, logo_url, description, terms, created_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NOW(),NOW())`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`,
         [
           process.env.COMPANY_NAME || 'Leidy Cleaner',
           process.env.COMPANY_LEGAL_NAME || 'Leidy Cleaner Serviços de Limpeza Ltda',

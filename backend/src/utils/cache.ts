@@ -6,6 +6,7 @@ interface CacheItem {
 class MemoryCache {
   private cache = new Map<string, CacheItem>();
   private defaultTTL = 300000; // 5 minutos
+  private intervalId: NodeJS.Timeout | null = null;
 
   set(key: string, data: any, ttl?: number): void {
     const expires = Date.now() + (ttl || this.defaultTTL);
@@ -44,7 +45,15 @@ class MemoryCache {
 
   // Executar cleanup a cada 5 minutos
   startCleanup(): void {
-    setInterval(() => this.cleanup(), 300000);
+    this.intervalId = setInterval(() => this.cleanup(), 300000);
+  }
+
+  // Parar cleanup (útil em testes para evitar handles abertos)
+  stopCleanup(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId as NodeJS.Timeout);
+      this.intervalId = null;
+    }
   }
 }
 

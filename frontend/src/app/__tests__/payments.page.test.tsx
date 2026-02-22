@@ -15,11 +15,11 @@ const searchParamsMock = { get: jest.fn(() => 'b1') };
 ((require('next/navigation') as any).useSearchParams as jest.Mock).mockReturnValue(searchParamsMock);
 
 function renderWithAuth(children: React.ReactNode) {
-  return render(
-    <AuthContext.Provider value={{ isAuthenticated: true, user: { id: 'u1', role: 'customer' }, login: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    return render(
+      <AuthContext.Provider value={{ isAuthenticated: true, user: { id: 'u1', role: 'customer', email: 'u1@x.com', name: 'User One' }, loading: false, login: jest.fn(), register: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
+        {children}
+      </AuthContext.Provider>
+    );
 }
 
 describe('PaymentsPage', () => {

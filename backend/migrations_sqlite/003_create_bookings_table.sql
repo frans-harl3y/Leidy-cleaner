@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   status TEXT(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
   total_price DECIMAL(10, 2) NOT NULL,
   notes TEXT,
-  created_at DATETIME DEFAULT datetime('now'),
-  updated_at DATETIME DEFAULT datetime('now')
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create indexes

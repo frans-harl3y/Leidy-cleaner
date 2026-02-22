@@ -15,7 +15,7 @@ describe('ProfilePage', () => {
 
   function renderWithAuth(children: React.ReactNode) {
     return render(
-      <AuthContext.Provider value={{ isAuthenticated: true, user: { id: 'u1', role: 'customer' }, login: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
+      <AuthContext.Provider value={{ isAuthenticated: true, user: { id: 'u1', role: 'customer', email: 'u1@x.com', name: 'User One' }, loading: false, login: jest.fn(), register: jest.fn(), logout: jest.fn(), refresh: jest.fn() }}>
         {children}
       </AuthContext.Provider>
     );

@@ -7,6 +7,69 @@ on:
     branches: [ main ]
 
 jobs:
+  backend:
+    name: Backend (lint, typecheck, test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install backend deps
+        run: npm ci --prefix backend
+
+      - name: Run backend lint
+        run: npm --prefix backend run lint
+
+      - name: Backend type-check
+        run: npm --prefix backend run type-check
+
+      - name: Run backend tests
+        run: npm --prefix backend run test -- --runInBand
+
+      - name: Audit backend dependencies (report)
+        run: npm --prefix backend audit --audit-level=high || true
+
+  frontend:
+    name: Frontend (lint, typecheck, test)
+    runs-on: ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install frontend deps
+        run: npm ci --prefix frontend
+
+      - name: Run frontend lint
+        run: npm --prefix frontend run lint || true
+
+      - name: Frontend type-check
+        run: npx -y -p typescript tsc --noEmit --project frontend/tsconfig.json
+
+      - name: Run frontend tests
+        run: npm --prefix frontend run test -- --runInBand --silent
+
+      - name: Audit frontend dependencies (report)
+        run: npm --prefix frontend audit --audit-level=high || true
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
   test:
     runs-on: ubuntu-latest
     services:

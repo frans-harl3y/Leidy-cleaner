@@ -5,11 +5,11 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   full_name TEXT NOT NULL,
   phone TEXT,
-  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'customer', 'admin', 'staff', 'provider')),
+  role TEXT NOT NULL DEFAULT 'customer',
   is_active INTEGER DEFAULT 1,
   last_login DATETIME,
-  created_at DATETIME DEFAULT datetime('now'),
-  updated_at DATETIME DEFAULT datetime('now')
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create indexes

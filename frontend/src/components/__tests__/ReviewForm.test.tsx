@@ -14,7 +14,7 @@ describe('ReviewForm', () => {
   it('submits rating and comment', async () => {
     const fake = { id: 'r1', rating: 3, comment: 'ok' };
     mockedApi.createReview.mockResolvedValue(fake as any);
-    mockedApi.client.post.mockResolvedValue({});
+    (mockedApi.client.post as unknown as jest.Mock).mockResolvedValue({});
 
     const onSubmitted = jest.fn();
     render(<ReviewForm bookingId="b1" onSubmitted={onSubmitted} />);
@@ -30,7 +30,7 @@ describe('ReviewForm', () => {
   it('uploads files when provided', async () => {
     const fake = { id: 'r2', rating: 4 };
     mockedApi.createReview.mockResolvedValue(fake as any);
-    mockedApi.client.post.mockResolvedValue({});
+    (mockedApi.client.post as unknown as jest.Mock).mockResolvedValue({});
 
     const onSubmitted = jest.fn();
     render(<ReviewForm bookingId="b1" onSubmitted={onSubmitted} />);

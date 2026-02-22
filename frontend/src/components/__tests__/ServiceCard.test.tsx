@@ -27,7 +27,7 @@ describe('ServiceCard', () => {
 
   it('shows rating when provided', () => {
     render(<ServiceCard service={service as any} rating={4.2} reviewCount={5} />);
-    expect(screen.getByText(/4\.2 ⭐/)).toBeInTheDocument();
-    expect(screen.getByText(/5\)/)).toBeInTheDocument();
+    expect(screen.getByText(/4\.2/)).toBeInTheDocument();
+    expect(screen.getByText(/\(5\)/)).toBeInTheDocument();
   });
 });

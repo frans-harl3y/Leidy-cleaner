@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS reviews (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   comment TEXT,
-  created_at DATETIME DEFAULT datetime('now'),
-  updated_at DATETIME DEFAULT datetime('now')
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create indexes
